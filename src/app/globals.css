@@ -105,3 +105,36 @@ html, body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Motion Graphics Flow Guide & Card Discovery Animations */
+@keyframes streamPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(240, 163, 82, 0.7)) drop-shadow(0 0 14px rgba(201, 111, 59, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(240, 163, 82, 0.95)) drop-shadow(0 0 26px rgba(201, 111, 59, 0.8));
+  }
+}
+
+.stream-glow {
+  animation: streamPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes borderGlowSweep {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.border-flow-glow {
+  background: linear-gradient(90deg, rgba(201, 111, 59, 0.3), rgba(240, 163, 82, 0.9), rgba(201, 111, 59, 0.3));
+  background-size: 200% 200%;
+  animation: borderGlowSweep 3.5s ease infinite;
+}
+

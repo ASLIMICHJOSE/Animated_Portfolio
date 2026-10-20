@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { RotateCcw } from "lucide-react";
+import { Wind, Play, Pause, Sparkles } from "lucide-react";
 
 interface Leaf {
   id: number;
@@ -19,26 +19,19 @@ interface Leaf {
   opacity: number;
   flipSpeed: number;
   flipAngle: number;
+  isSettledInHero: boolean;
+  settleOffset: number;
 }
 
-interface SettledLeaf {
-  relX: number;
-  relY: number;
-  size: number;
-  angle: number;
-  color: string;
-  opacity: number;
-  flipAngle: number;
-}
-
-interface Particle {
+interface WindParticle {
   x: number;
   y: number;
   vx: number;
   vy: number;
-  color: string;
-  alpha: number;
+  life: number;
+  maxLife: number;
   size: number;
+  alpha: number;
 }
 
 const AUTUMN_COLORS = [
@@ -53,9 +46,20 @@ const AUTUMN_COLORS = [
 
 export default function FallingLeaves() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [collectedCount, setCollectedCount] = useState(0);
+  const [isBlowing, setIsBlowing] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
-  const releaseTriggerRef = useRef(false);
+  const [piledCount, setPiledCount] = useState(0);
+
+  const isBlowingRef = useRef(true);
+  const isDraggingRef = useRef(false);
+
+  useEffect(() => {
+    isBlowingRef.current = isBlowing;
+  }, [isBlowing]);
+
+  useEffect(() => {
+    isDraggingRef.current = isDragging;
+  }, [isDragging]);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -71,38 +75,53 @@ export default function FallingLeaves() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
+    // Dock coordinates on bottom right
+    let dockX = width - 110;
+    let dockY = height - 90;
+
     const handleResize = () => {
       if (!canvas) return;
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       dockX = width - 110;
-      dockY = height - 80;
+      dockY = height - 90;
     };
 
     window.addEventListener("resize", handleResize, { passive: true });
 
-    // Docked coordinates on the side
-    let dockX = width - 110;
-    let dockY = height - 80;
+    // Track scroll state for hero AFK vs cascading
+    let currentScrollY = window.scrollY;
+    let prevScrollY = currentScrollY;
+    let wasAtHeroTop = currentScrollY < 60;
 
-    // Bucket physics variables
-    const bucket = {
+    const handleScroll = () => {
+      currentScrollY = window.scrollY;
+      const isNowAtHero = currentScrollY < 60;
+
+      // When transitioning from Hero AFK to Scrolling Down -> Cascade all settled leaves!
+      if (wasAtHeroTop && !isNowAtHero) {
+        cascadeSettledLeaves();
+      }
+
+      wasAtHeroTop = isNowAtHero;
+      prevScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    // Blower machine physics & transform state
+    const blower = {
       x: dockX,
       y: dockY,
       targetX: dockX,
       targetY: dockY,
-      width: 100,
-      height: 65,
       vx: 0,
       vy: 0,
-      tilt: 0,
-      bounceY: 0,
-      bounceVy: 0,
+      angle: -Math.PI * 0.75, // pointing up-left into the scene by default
+      targetAngle: -Math.PI * 0.75,
       isHeld: false,
+      fanAngle: 0,
     };
-
-    let pointerX = 0;
-    let pointerY = 0;
 
     const handlePointerDown = (e: MouseEvent | TouchEvent) => {
       let cx = 0;
@@ -115,13 +134,10 @@ export default function FallingLeaves() {
         cy = (e as MouseEvent).clientY;
       }
 
-      // Check if clicked inside or near bucket
-      const dist = Math.hypot(cx - bucket.x, cy - bucket.y);
+      const dist = Math.hypot(cx - blower.x, cy - blower.y);
       if (dist < 75) {
-        bucket.isHeld = true;
+        blower.isHeld = true;
         setIsDragging(true);
-        pointerX = cx;
-        pointerY = cy;
       }
     };
 
@@ -135,22 +151,28 @@ export default function FallingLeaves() {
         cx = (e as MouseEvent).clientX;
         cy = (e as MouseEvent).clientY;
       }
-      pointerX = cx;
-      pointerY = cy;
 
-      if (bucket.isHeld) {
-        bucket.targetX = Math.max(bucket.width / 2 + 10, Math.min(width - bucket.width / 2 - 10, cx));
-        bucket.targetY = Math.max(bucket.height + 20, Math.min(height - 40, cy));
+      if (blower.isHeld) {
+        blower.targetX = Math.max(50, Math.min(width - 50, cx));
+        blower.targetY = Math.max(50, Math.min(height - 50, cy));
+
+        // Aim blower towards movement or mouse position
+        const dx = cx - blower.x;
+        const dy = cy - blower.y;
+        if (Math.hypot(dx, dy) > 8) {
+          blower.targetAngle = Math.atan2(dy, dx);
+        }
       }
     };
 
     const handlePointerUp = () => {
-      if (bucket.isHeld) {
-        bucket.isHeld = false;
+      if (blower.isHeld) {
+        blower.isHeld = false;
         setIsDragging(false);
-        // Gently return towards side dock
-        bucket.targetX = dockX;
-        bucket.targetY = dockY;
+        // Smoothly return towards side dock
+        blower.targetX = dockX;
+        blower.targetY = dockY;
+        blower.targetAngle = -Math.PI * 0.75;
       }
     };
 
@@ -162,34 +184,48 @@ export default function FallingLeaves() {
     window.addEventListener("touchmove", handlePointerMove, { passive: true });
     window.addEventListener("touchend", handlePointerUp);
 
-    // Active falling leaves
-    const isMobile = width < 768;
-    const count = isMobile ? 18 : 34;
-
+    // Leaves creation & pool
+    const leafCount = width < 768 ? 24 : 45;
     let leafIdCounter = 0;
+
     const createLeaf = (initialRandomY = false): Leaf => ({
       id: leafIdCounter++,
       x: Math.random() * width,
-      y: initialRandomY ? Math.random() * height : -35,
+      y: initialRandomY ? Math.random() * (height - 80) : -40,
       size: Math.random() * 8 + 14,
-      speedX: Math.random() * 0.8 - 0.4,
-      speedY: Math.random() * 1.0 + 0.9,
+      speedX: (Math.random() - 0.5) * 1.2,
+      speedY: Math.random() * 1.2 + 1.0,
       angle: Math.random() * Math.PI * 2,
-      angleSpeed: (Math.random() - 0.5) * 0.02,
-      oscillationSpeed: Math.random() * 0.02 + 0.01,
-      oscillationDistance: Math.random() * 30 + 15,
+      angleSpeed: (Math.random() - 0.5) * 0.03,
+      oscillationSpeed: Math.random() * 0.02 + 0.015,
+      oscillationDistance: Math.random() * 25 + 15,
       oscillationOffset: Math.random() * Math.PI * 2,
       color: AUTUMN_COLORS[Math.floor(Math.random() * AUTUMN_COLORS.length)],
       opacity: Math.random() * 0.35 + 0.65,
-      flipSpeed: Math.random() * 0.03 + 0.015,
+      flipSpeed: Math.random() * 0.03 + 0.02,
       flipAngle: Math.random() * Math.PI,
+      isSettledInHero: false,
+      settleOffset: (Math.random() - 0.5) * 18,
     });
 
-    let fallingLeaves: Leaf[] = Array.from({ length: count }, () => createLeaf(true));
-    let settledLeaves: SettledLeaf[] = [];
-    let particles: Particle[] = [];
+    const leaves: Leaf[] = Array.from({ length: leafCount }, () => createLeaf(true));
+    const windParticles: WindParticle[] = [];
 
-    // Draw Maple Leaf
+    // Cascade all settled leaves when user scrolls out of hero
+    const cascadeSettledLeaves = () => {
+      leaves.forEach((leaf) => {
+        if (leaf.isSettledInHero) {
+          leaf.isSettledInHero = false;
+          leaf.speedY = Math.random() * 3.5 + 3.0; // dynamic downward burst
+          leaf.speedX = (Math.random() - 0.5) * 5.0; // horizontal scatter
+          leaf.angleSpeed = (Math.random() - 0.5) * 0.12;
+          leaf.flipSpeed = Math.random() * 0.08 + 0.04;
+        }
+      });
+      setPiledCount(0);
+    };
+
+    // Draw Maple Leaf shape
     const drawMapleLeaf = (
       context: CanvasRenderingContext2D,
       size: number,
@@ -215,7 +251,7 @@ export default function FallingLeaves() {
       context.fill();
 
       // Stem
-      context.strokeStyle = "rgba(57, 40, 32, 0.5)";
+      context.strokeStyle = "rgba(57, 40, 32, 0.6)";
       context.lineWidth = 1;
       context.beginPath();
       context.moveTo(0, size * 0.4);
@@ -225,235 +261,288 @@ export default function FallingLeaves() {
       context.restore();
     };
 
-    // Draw Japanese Woven Wood Bucket
-    const drawBucket = (
+    // Draw Autumn Blower Machine
+    const drawBlower = (
       context: CanvasRenderingContext2D,
       bx: number,
       by: number,
-      bw: number,
-      bh: number,
-      tilt: number
+      bAngle: number,
+      fanRot: number,
+      blowing: boolean
     ) => {
       context.save();
       context.translate(bx, by);
-      context.rotate(tilt);
+      context.rotate(bAngle);
 
-      const topW = bw;
-      const botW = bw * 0.75;
-      const halfTop = topW / 2;
-      const halfBot = botW / 2;
-
-      // Drop shadow
+      // Shadow
+      context.save();
       context.beginPath();
-      context.ellipse(0, bh + 4, halfBot + 6, 8, 0, 0, Math.PI * 2);
-      context.fillStyle = "rgba(0,0,0,0.5)";
+      context.ellipse(0, 15, 35, 12, 0, 0, Math.PI * 2);
+      context.fillStyle = "rgba(0,0,0,0.45)";
       context.fill();
+      context.restore();
 
-      // Bucket Wooden Body
+      // Long Tapered Air Nozzle Tube (facing right in local coords)
       context.beginPath();
-      context.moveTo(-halfTop, 0);
-      context.lineTo(halfTop, 0);
-      context.lineTo(halfBot, bh);
-      context.lineTo(-halfBot, bh);
+      context.moveTo(18, -12);
+      context.lineTo(75, -6);
+      context.lineTo(75, 6);
+      context.lineTo(18, 12);
       context.closePath();
-
-      const woodGrad = context.createLinearGradient(-halfTop, 0, halfTop, 0);
-      woodGrad.addColorStop(0, "#2D1E16");
-      woodGrad.addColorStop(0.2, "#4A3326");
-      woodGrad.addColorStop(0.5, "#684835");
-      woodGrad.addColorStop(0.8, "#4A3326");
-      woodGrad.addColorStop(1, "#2D1E16");
-      context.fillStyle = woodGrad;
+      const nozzleGrad = context.createLinearGradient(18, 0, 75, 0);
+      nozzleGrad.addColorStop(0, "#2D1E16");
+      nozzleGrad.addColorStop(0.5, "#4A3326");
+      nozzleGrad.addColorStop(1, "#392820");
+      context.fillStyle = nozzleGrad;
       context.fill();
       context.strokeStyle = "#C96F3B";
       context.lineWidth = 1.5;
       context.stroke();
 
-      // Brass Hoops (Golden Bands)
-      const drawBand = (yRatio: number) => {
-        const currentW = halfTop - (halfTop - halfBot) * yRatio;
-        const curY = bh * yRatio;
-        context.beginPath();
-        context.ellipse(0, curY, currentW, 4, 0, 0, Math.PI * 2);
-        context.strokeStyle = "#F0A352";
-        context.lineWidth = 2.5;
-        context.stroke();
-      };
-      drawBand(0.35);
-      drawBand(0.75);
-
-      // Render Collected Leaves Inside & Overfilling Bucket
-      for (const leaf of settledLeaves) {
-        context.save();
-        context.translate(leaf.relX, leaf.relY);
-        context.rotate(leaf.angle);
-        drawMapleLeaf(context, leaf.size, leaf.color, leaf.opacity, leaf.flipAngle);
-        context.restore();
-      }
-
-      // Bucket Top Rim (Inner & Outer Ellipse)
+      // Polished Brass Rings on Nozzle
       context.beginPath();
-      context.ellipse(0, 0, halfTop, 8, 0, 0, Math.PI * 2);
-      context.fillStyle = "rgba(32, 28, 25, 0.85)";
+      context.rect(45, -9, 4, 18);
+      context.rect(68, -7, 5, 14);
+      context.fillStyle = "#F0A352";
+      context.fill();
+
+      // Cylindrical Motor & Turbine Housing
+      context.beginPath();
+      context.ellipse(0, 0, 24, 20, 0, 0, Math.PI * 2);
+      const bodyGrad = context.createRadialGradient(-6, -6, 2, 0, 0, 24);
+      bodyGrad.addColorStop(0, "#684835");
+      bodyGrad.addColorStop(0.7, "#392820");
+      bodyGrad.addColorStop(1, "#201C19");
+      context.fillStyle = bodyGrad;
       context.fill();
       context.strokeStyle = "#F0A352";
       context.lineWidth = 2;
       context.stroke();
 
-      // Polished Brass Diamond Emblem
+      // Rotating Turbine Impeller / Fan Blades visible inside intake grille
       context.save();
-      context.translate(0, bh * 0.55);
-      context.rotate(Math.PI / 4);
-      context.fillStyle = "#F0A352";
-      context.fillRect(-5, -5, 10, 10);
+      context.rotate(fanRot);
+      for (let b = 0; b < 6; b++) {
+        context.rotate(Math.PI / 3);
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.lineTo(12, 4);
+        context.lineTo(14, -2);
+        context.closePath();
+        context.fillStyle = "#F0A352";
+        context.fill();
+      }
       context.restore();
 
-      // Hint badge when resting at dock
-      if (!bucket.isHeld && Math.hypot(bucket.x - dockX, bucket.y - dockY) < 15) {
-        context.font = "500 10px 'Plus Jakarta Sans', sans-serif";
-        context.fillStyle = "rgba(240, 163, 82, 0.85)";
-        context.textAlign = "center";
-        context.fillText("Drag bucket", 0, -18);
+      // Intake Grille Outer Ring
+      context.beginPath();
+      context.arc(0, 0, 10, 0, Math.PI * 2);
+      context.strokeStyle = "rgba(240, 163, 82, 0.7)";
+      context.lineWidth = 1.5;
+      context.stroke();
+
+      // Ergonomic Rear Handle
+      context.beginPath();
+      context.arc(-18, -12, 14, 0, Math.PI * 1.5, true);
+      context.strokeStyle = "#C96F3B";
+      context.lineWidth = 5;
+      context.lineCap = "round";
+      context.stroke();
+
+      // Active Air Blast Cone & Wind Exhaust from Nozzle
+      if (blowing) {
+        context.save();
+        const tipX = 75;
+        const blastGrad = context.createRadialGradient(tipX, 0, 5, tipX + 60, 0, 90);
+        blastGrad.addColorStop(0, "rgba(240, 163, 82, 0.8)");
+        blastGrad.addColorStop(0.3, "rgba(245, 239, 229, 0.35)");
+        blastGrad.addColorStop(1, "rgba(201, 111, 59, 0)");
+
+        context.beginPath();
+        context.moveTo(tipX, -6);
+        context.lineTo(tipX + 160, -50);
+        context.lineTo(tipX + 160, 50);
+        context.lineTo(tipX, 6);
+        context.closePath();
+        context.fillStyle = blastGrad;
+        context.fill();
+
+        // Wind Breeze Lines
+        context.strokeStyle = "rgba(245, 239, 229, 0.5)";
+        context.lineWidth = 1.5;
+        context.beginPath();
+        context.moveTo(tipX + 10, -3);
+        context.quadraticCurveTo(tipX + 60, -15, tipX + 130, -30);
+        context.moveTo(tipX + 10, 3);
+        context.quadraticCurveTo(tipX + 60, 15, tipX + 130, 30);
+        context.stroke();
+
+        context.restore();
       }
 
       context.restore();
     };
 
     let time = 0;
+
     const render = () => {
       time += 1;
       ctx.clearRect(0, 0, width, height);
 
-      // Handle Leaf Release
-      if (releaseTriggerRef.current) {
-        releaseTriggerRef.current = false;
-        settledLeaves.forEach((sl) => {
-          for (let p = 0; p < 2; p++) {
-            particles.push({
-              x: bucket.x + sl.relX,
-              y: bucket.y + sl.relY,
-              vx: (Math.random() - 0.5) * 6,
-              vy: -Math.random() * 7 - 3,
-              color: sl.color,
-              alpha: 1,
-              size: sl.size * 0.8,
-            });
-          }
-        });
-        settledLeaves = [];
-        setCollectedCount(0);
+      const isHeroAfk = currentScrollY < 60;
+      const blowingActive = isBlowingRef.current || blower.isHeld;
+
+      // Update Blower Physics
+      const spring = blower.isHeld ? 0.2 : 0.08;
+      const friction = blower.isHeld ? 0.75 : 0.85;
+
+      blower.vx += (blower.targetX - blower.x) * spring;
+      blower.vx *= friction;
+      blower.x += blower.vx;
+
+      blower.vy += (blower.targetY - blower.y) * spring;
+      blower.vy *= friction;
+      blower.y += blower.vy;
+
+      // Smooth angle interpolation
+      let angleDiff = blower.targetAngle - blower.angle;
+      while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+      while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+      blower.angle += angleDiff * 0.15;
+
+      // Spin fan faster when blowing
+      if (blowingActive) {
+        blower.fanAngle += 0.35;
+      } else {
+        blower.fanAngle += 0.05;
       }
 
-      // Bucket Physics: Follow target with spring & damping
-      const spring = bucket.isHeld ? 0.2 : 0.08;
-      const friction = bucket.isHeld ? 0.72 : 0.82;
+      // Spawn wind particles from blower nozzle when active
+      if (blowingActive && (time % 2 === 0)) {
+        const nozzleDist = 75;
+        const nozzleX = blower.x + Math.cos(blower.angle) * nozzleDist;
+        const nozzleY = blower.y + Math.sin(blower.angle) * nozzleDist;
+        const spread = (Math.random() - 0.5) * 0.45;
+        const particleAngle = blower.angle + spread;
+        const pSpeed = Math.random() * 8 + 8;
 
-      const dx = bucket.targetX - bucket.x;
-      const dy = bucket.targetY - bucket.y;
+        windParticles.push({
+          x: nozzleX,
+          y: nozzleY,
+          vx: Math.cos(particleAngle) * pSpeed,
+          vy: Math.sin(particleAngle) * pSpeed,
+          life: 0,
+          maxLife: Math.random() * 20 + 15,
+          size: Math.random() * 2.5 + 1.5,
+          alpha: 0.8,
+        });
+      }
 
-      bucket.vx += dx * spring;
-      bucket.vx *= friction;
-      bucket.x += bucket.vx;
+      // Render Wind Particles
+      for (let i = windParticles.length - 1; i >= 0; i--) {
+        const wp = windParticles[i];
+        wp.x += wp.vx;
+        wp.y += wp.vy;
+        wp.life++;
+        wp.alpha = (1 - wp.life / wp.maxLife) * 0.75;
 
-      bucket.vy += dy * spring;
-      bucket.vy *= friction;
-      bucket.y += bucket.vy;
-
-      // Tilt proportional to horizontal velocity
-      const targetTilt = Math.max(-0.35, Math.min(0.35, bucket.vx * 0.02));
-      bucket.tilt += (targetTilt - bucket.tilt) * 0.15;
-
-      // Bounce return
-      bucket.bounceVy += -bucket.bounceY * 0.15;
-      bucket.bounceVy *= 0.75;
-      bucket.bounceY += bucket.bounceVy;
-
-      // Particles
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.12;
-        p.alpha -= 0.02;
-
-        if (p.alpha <= 0) {
-          particles.splice(i, 1);
+        if (wp.life >= wp.maxLife) {
+          windParticles.splice(i, 1);
         } else {
           ctx.save();
-          ctx.globalAlpha = p.alpha;
-          ctx.fillStyle = p.color;
+          ctx.globalAlpha = wp.alpha;
+          ctx.fillStyle = "#F5EFE5";
+          ctx.shadowColor = "#F0A352";
+          ctx.shadowBlur = 6;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 0.4, 0, Math.PI * 2);
+          ctx.arc(wp.x, wp.y, wp.size, 0, Math.PI * 2);
           ctx.fill();
           ctx.restore();
         }
       }
 
-      // Falling Leaves & Collision
-      const bucketTopY = bucket.y - 12;
-      const bucketLeft = bucket.x - bucket.width / 2;
-      const bucketRight = bucket.x + bucket.width / 2;
+      // Ground plane for hero accumulation (30px above bottom edge)
+      const heroGroundY = height - 35;
+      let settledCount = 0;
 
-      for (let i = 0; i < fallingLeaves.length; i++) {
-        const leaf = fallingLeaves[i];
+      // Update & Render Leaves
+      const nozzleDist = 75;
+      const nozzleX = blower.x + Math.cos(blower.angle) * nozzleDist;
+      const nozzleY = blower.y + Math.sin(blower.angle) * nozzleDist;
 
-        leaf.y += leaf.speedY;
-        leaf.x += leaf.speedX + Math.sin(time * leaf.oscillationSpeed + leaf.oscillationOffset) * 0.55;
-        leaf.angle += leaf.angleSpeed;
-        leaf.flipAngle += leaf.flipSpeed;
+      for (let i = 0; i < leaves.length; i++) {
+        const leaf = leaves[i];
 
-        // Collision with Bucket Rim
-        if (
-          leaf.y >= bucketTopY &&
-          leaf.y <= bucketTopY + 28 &&
-          leaf.x >= bucketLeft &&
-          leaf.x <= bucketRight
-        ) {
-          bucket.bounceVy += 4;
+        // 1. BLOWER WIND INTERACTION
+        if (blowingActive) {
+          const dx = leaf.x - nozzleX;
+          const dy = leaf.y - nozzleY;
+          const distToNozzle = Math.hypot(dx, dy);
 
-          // Sparkle burst
-          for (let s = 0; s < 4; s++) {
-            particles.push({
-              x: leaf.x,
-              y: leaf.y,
-              vx: (Math.random() - 0.5) * 3,
-              vy: -Math.random() * 3 - 1,
-              color: "#F0A352",
-              alpha: 0.9,
-              size: Math.random() * 3 + 2,
-            });
+          // Check if leaf is within wind cone (~240px range)
+          if (distToNozzle < 260) {
+            const angleToLeaf = Math.atan2(dy, dx);
+            let relAngle = angleToLeaf - blower.angle;
+            while (relAngle < -Math.PI) relAngle += Math.PI * 2;
+            while (relAngle > Math.PI) relAngle -= Math.PI * 2;
+
+            if (Math.abs(relAngle) < 0.65) {
+              // Inside wind cone!
+              const force = (1 - distToNozzle / 260) * 14;
+              leaf.speedX += Math.cos(blower.angle) * force * 0.45;
+              leaf.speedY += Math.sin(blower.angle) * force * 0.45;
+              leaf.angleSpeed += (Math.random() - 0.5) * 0.1;
+              leaf.flipSpeed += 0.04;
+
+              // If it was resting on the hero ground, wake it up and blow it into the air!
+              if (leaf.isSettledInHero) {
+                leaf.isSettledInHero = false;
+              }
+            }
           }
-
-          // Leaves can continuously overfill the bucket!
-          // They stack up and layer over the top rim
-          const pileHeight = Math.min(60, settledLeaves.length * 1.2);
-          const spreadFactor = 0.8 + Math.min(0.4, settledLeaves.length * 0.01);
-          const relX = (leaf.x - bucket.x) * spreadFactor;
-          const relY = bucket.height * 0.7 - pileHeight;
-
-          settledLeaves.push({
-            relX,
-            relY,
-            size: leaf.size * 0.85,
-            angle: leaf.angle + (Math.random() - 0.5) * 0.4,
-            color: leaf.color,
-            opacity: 0.95,
-            flipAngle: leaf.flipAngle,
-          });
-
-          setCollectedCount((prev) => prev + 1);
-
-          // Respawn at top
-          fallingLeaves[i] = createLeaf(false);
-          continue;
         }
 
-        // Reset if off bottom or sides
-        if (leaf.y > height + 40 || leaf.x < -40 || leaf.x > width + 40) {
-          fallingLeaves[i] = createLeaf(false);
-          fallingLeaves[i].x = Math.random() * (width + 60) - 30;
+        // 2. HERO ACCUMULATION (AFK at bottom of hero section)
+        if (isHeroAfk && !leaf.isSettledInHero) {
+          const targetGround = heroGroundY + leaf.settleOffset;
+          if (leaf.y >= targetGround && leaf.speedY > 0) {
+            // Leaf hits the hero ground plane! Settle down.
+            leaf.isSettledInHero = true;
+            leaf.y = targetGround;
+            leaf.speedX = 0;
+            leaf.speedY = 0;
+            leaf.angleSpeed = 0;
+            leaf.flipSpeed = 0;
+          }
         }
 
+        // 3. NORMAL OR CASCADING PHYSICS
+        if (!leaf.isSettledInHero) {
+          leaf.x += leaf.speedX + Math.sin(time * leaf.oscillationSpeed + leaf.oscillationOffset) * 0.55;
+          leaf.y += leaf.speedY;
+          leaf.angle += leaf.angleSpeed;
+          leaf.flipAngle += leaf.flipSpeed;
+
+          // Drag air friction
+          leaf.speedX *= 0.96;
+          if (leaf.speedY > 2.0) {
+            leaf.speedY *= 0.98; // settle back towards terminal velocity
+          }
+        } else {
+          settledCount++;
+          // Gentle idle rustle while settled on ground
+          leaf.angle += Math.sin(time * 0.05 + leaf.id) * 0.003;
+        }
+
+        // Reset if blown out of bounds (except settled leaves)
+        if (!leaf.isSettledInHero) {
+          if (leaf.y > height + 50 || leaf.x < -60 || leaf.x > width + 60) {
+            leaves[i] = createLeaf(false);
+            leaves[i].x = Math.random() * (width + 60) - 30;
+          }
+        }
+
+        // Draw leaf
         ctx.save();
         ctx.translate(leaf.x, leaf.y);
         ctx.rotate(leaf.angle);
@@ -461,8 +550,10 @@ export default function FallingLeaves() {
         ctx.restore();
       }
 
-      // Draw Bucket
-      drawBucket(ctx, bucket.x, bucket.y, bucket.width, bucket.height, bucket.tilt);
+      setPiledCount(settledCount);
+
+      // Draw Blower Machine
+      drawBlower(ctx, blower.x, blower.y, blower.angle, blower.fanAngle, blowingActive);
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -472,6 +563,7 @@ export default function FallingLeaves() {
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousedown", handlePointerDown);
       window.removeEventListener("mousemove", handlePointerMove);
       window.removeEventListener("mouseup", handlePointerUp);
@@ -480,10 +572,6 @@ export default function FallingLeaves() {
       window.removeEventListener("touchend", handlePointerUp);
     };
   }, []);
-
-  const handleEmptyBasket = () => {
-    releaseTriggerRef.current = true;
-  };
 
   return (
     <>
@@ -496,23 +584,30 @@ export default function FallingLeaves() {
         aria-hidden="true"
       />
 
-      {/* Floating Autumn Basket Game HUD (Quiet on Side) */}
-      <div className="fixed bottom-5 right-5 z-40 select-none pointer-events-auto">
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#201C19]/80 backdrop-blur-xl border border-[#C96F3B]/35 shadow-xl text-xs font-mono text-[#F5EFE5]">
-          <span className="text-[#F5EFE5]/70">Leaves Caught:</span>
-          <span className="font-bold text-[#F0A352] px-1.5 py-0.5 rounded bg-[#392820]">
-            {collectedCount}
-          </span>
+      {/* Floating Autumn Leaf Blower HUD (Bottom-Right) */}
+      <div className="fixed bottom-5 right-5 z-40 select-none pointer-events-auto flex items-center gap-2">
+        <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#201C19]/85 backdrop-blur-xl border border-[#C96F3B]/35 shadow-xl text-xs font-mono text-[#F5EFE5]">
+          <Wind className={`w-3.5 h-3.5 ${isBlowing ? "text-[#F0A352] animate-pulse" : "text-[#F5EFE5]/50"}`} />
+          <span className="text-[#F5EFE5]/70">Leaf Blower:</span>
 
-          {collectedCount > 0 && (
-            <button
-              onClick={handleEmptyBasket}
-              className="p-1 rounded hover:bg-[#392820] text-[#F5EFE5]/60 hover:text-[#C96F3B] transition-colors focus:outline-none"
-              title="Release leaves to the wind"
-              aria-label="Release leaves"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
+          <button
+            onClick={() => setIsBlowing(!isBlowing)}
+            className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all ${
+              isBlowing
+                ? "bg-[#C96F3B] text-[#F5EFE5] shadow-sm shadow-[#C96F3B]/40"
+                : "bg-[#392820] text-[#F5EFE5]/60 hover:text-[#F0A352]"
+            }`}
+            title="Toggle blower air stream"
+            aria-label="Toggle blower"
+          >
+            {isBlowing ? "Active" : "Idle"}
+          </button>
+
+          {piledCount > 0 && (
+            <span className="text-[10px] text-[#F0A352] pl-1 border-l border-[#C96F3B]/30 flex items-center gap-1">
+              <Sparkles className="w-2.5 h-2.5" />
+              <span>{piledCount} Piled</span>
+            </span>
           )}
         </div>
       </div>

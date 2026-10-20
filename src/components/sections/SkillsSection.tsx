@@ -19,14 +19,14 @@ export default function SkillsSection() {
   const cardsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const { gsap } = initGSAP();
+    const { gsap, ScrollTrigger } = initGSAP();
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
 
     const ctx = gsap.context(() => {
-      // Parallax scroll on anime pavilion background
+      // 1. Parallax scroll on anime pavilion background
       if (bgImageRef.current && sectionRef.current) {
         gsap.to(bgImageRef.current, {
           yPercent: 18,
@@ -41,25 +41,28 @@ export default function SkillsSection() {
         });
       }
 
-      // Staggered Entrance for Skill Cards
-      const cards = cardsRef.current?.children;
+      // 2. Individual Flow Discovery for Skill Cards
+      const cards = cardsRef.current?.querySelectorAll(".skill-discovery-card");
       if (cards && cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          { opacity: 0, y: 50, scale: 0.96 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.85,
-            stagger: 0.12,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: cardsRef.current,
-              start: "top 78%",
-            },
-          }
-        );
+        cards.forEach((card) => {
+          gsap.fromTo(
+            card,
+            { opacity: 0, y: 55, scale: 0.94, rotateX: 6 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              rotateX: 0,
+              duration: 0.85,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 86%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        });
       }
     }, sectionRef);
 
@@ -116,7 +119,7 @@ export default function SkillsSection() {
           description="A balanced stack centered on expressive user interfaces, strict typing, and maintainable architectures. Designed without false percentage meters."
         />
 
-        {/* Editorial Categories Grid */}
+        {/* Editorial Categories Grid with Individual Flow Discovery */}
         <div
           ref={cardsRef}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
@@ -124,10 +127,13 @@ export default function SkillsSection() {
           {portfolioData.skillCategories.map((category: SkillCategory, index: number) => (
             <div
               key={category.title}
-              className={`rounded-2xl p-6 sm:p-8 glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352] transition-all duration-500 hover:shadow-2xl hover:shadow-[#C96F3B]/25 group flex flex-col justify-between backdrop-blur-xl ${
+              className={`skill-discovery-card rounded-2xl p-6 sm:p-8 glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352] transition-all duration-500 hover:shadow-2xl hover:shadow-[#C96F3B]/25 group flex flex-col justify-between backdrop-blur-xl relative overflow-hidden ${
                 index === 0 ? "md:col-span-2 lg:col-span-1" : ""
               }`}
             >
+              {/* Top Flow Discovery Border Flare */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F0A352] to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
+
               <div>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
