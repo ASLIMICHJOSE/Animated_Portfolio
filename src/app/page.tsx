@@ -3,6 +3,7 @@ import FallingLeaves from "@/components/animation/FallingLeaves";
 import CinematicWorld3D from "@/components/animation/CinematicWorld3D";
 import SmoothScroll from "@/components/animation/SmoothScroll";
 import ScrollFlowCompanion from "@/components/animation/ScrollFlowCompanion";
+import ContinuousSectionConduit from "@/components/animation/ContinuousSectionConduit";
 import HeroSection from "@/components/sections/HeroSection";
 import AboutSection from "@/components/sections/AboutSection";
 import SkillsSection from "@/components/sections/SkillsSection";
@@ -28,6 +29,9 @@ export default function Home() {
 
         {/* Cinematic Spatial Portfolio Sections */}
         <main id="main-content" className="relative z-10">
+          {/* Continuous Interconnected Section-to-Section Tracking Conduit */}
+          <ContinuousSectionConduit />
+
           {/* Section A: Opening & Hero */}
           <HeroSection />
 

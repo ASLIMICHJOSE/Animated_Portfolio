@@ -7,6 +7,7 @@ import {
   Check,
   ArrowUp,
   Send,
+  Sparkles,
 } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
@@ -20,15 +21,43 @@ export default function ContactSection() {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const [tilt, setTilt] = useState({
+    rotateX: 0,
+    rotateY: 0,
+    glareX: 50,
+    glareY: 50,
+    isHovered: false,
+  });
+
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -5;
+    const rotateY = ((x - centerX) / centerX) * 5;
+    const glareX = (x / rect.width) * 100;
+    const glareY = (y / rect.height) * 100;
+
+    setTilt({ rotateX, rotateY, glareX, glareY, isHovered: true });
+  };
+
+  const handleCardMouseLeave = () => {
+    setTilt({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50, isHovered: false });
+  };
+
   useEffect(() => {
-    const { gsap } = initGSAP();
+    const { gsap, ScrollTrigger } = initGSAP();
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
 
     const ctx = gsap.context(() => {
-      // Parallax scroll on anime twilight background
+      // 1. Parallax scroll on anime twilight background
       if (bgImageRef.current && sectionRef.current) {
         gsap.to(bgImageRef.current, {
           yPercent: 18,
@@ -43,22 +72,25 @@ export default function ContactSection() {
         });
       }
 
-      // Card Entrance
-      gsap.fromTo(
-        cardRef.current,
-        { opacity: 0, y: 55, scale: 0.95 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 1.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-          },
-        }
-      );
+      // 2. Smooth Card Entrance Reveal
+      if (cardRef.current && sectionRef.current) {
+        gsap.fromTo(
+          cardRef.current,
+          { opacity: 0, y: 55, scale: 0.94 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: cardRef.current,
+              start: "top 80%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      }
     }, sectionRef);
 
     return () => ctx.revert();
@@ -114,17 +146,38 @@ export default function ContactSection() {
           description="Whether you have an ambitious digital vision, an intriguing project, or simply want to converse about cinematic web design, my inbox is always open."
         />
 
-        {/* Central Contact Card */}
+        {/* Central Contact Card with 3D Tilt */}
         <div
           ref={cardRef}
-          className="p-8 sm:p-12 rounded-3xl glass-panel border border-[#C96F3B]/40 shadow-2xl shadow-black/70 relative overflow-hidden text-center backdrop-blur-2xl"
+          onMouseMove={handleCardMouseMove}
+          onMouseLeave={handleCardMouseLeave}
+          className="p-8 sm:p-12 rounded-3xl glass-panel border border-[#C96F3B]/40 shadow-2xl shadow-black/70 relative overflow-hidden text-center backdrop-blur-2xl will-change-transform"
+          style={{
+            transform: tilt.isHovered
+              ? `perspective(1000px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`
+              : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+            transition: tilt.isHovered ? "transform 0.12s ease-out" : "transform 0.5s ease-out",
+            boxShadow: tilt.isHovered
+              ? "0 25px 50px -15px rgba(201, 111, 59, 0.4), 0 0 30px rgba(240, 163, 82, 0.2)"
+              : "0 10px 25px -10px rgba(0, 0, 0, 0.7)",
+          }}
         >
+          {/* Specular glare */}
+          {tilt.isHovered && (
+            <div
+              className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 rounded-3xl"
+              style={{
+                background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(240, 163, 82, 0.2) 0%, transparent 65%)`,
+              }}
+            />
+          )}
+
           {/* Subtle Golden Glow Accent */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-1 bg-gradient-to-r from-transparent via-[#F0A352] to-transparent shadow-lg shadow-[#F0A352]/50" />
 
           {/* Status Indicator */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#392820]/90 border border-[#C96F3B]/40 text-xs font-mono text-[#F0A352] mb-8 shadow-md">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span>{portfolioData.personal.availability}</span>
           </div>
 
@@ -202,27 +255,25 @@ export default function ContactSection() {
         </div>
       </div>
 
-      {/* Minimal Footer */}
-      <footer className="relative z-10 max-w-7xl mx-auto w-full pt-16 mt-16 border-t border-[#C96F3B]/20 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs font-mono text-[#F5EFE5]/60">
-        <div className="flex items-center gap-3">
-          <span className="font-serif font-bold text-sm text-[#F5EFE5]">
-            ASLI MICH JOSE
-          </span>
-          <span>•</span>
-          <span>© 2026 All Rights Reserved</span>
+      {/* Footer Navigation & Copyright */}
+      <footer className="relative z-10 w-full pt-16 pb-8 border-t border-[#C96F3B]/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#F5EFE5]/50">
+        <div>
+          <span>&copy; 2026 {portfolioData.personal.name}. All rights reserved.</span>
         </div>
 
         <div className="flex items-center gap-6">
-          <span className="hidden md:inline font-mono text-[#F0A352]/80 uppercase tracking-widest text-[11px]">
-            Next.js • Three.js • TypeScript • GSAP
+          <span className="text-[#F0A352] flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Built with Next.js, Three.js &amp; GSAP</span>
           </span>
+
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#392820]/80 hover:bg-[#C96F3B]/60 border border-[#C96F3B]/40 text-[#F5EFE5] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#C96F3B]"
-            aria-label="Back to top"
+            className="flex items-center gap-1 text-[#F5EFE5]/70 hover:text-[#F0A352] transition-colors p-1 rounded"
+            aria-label="Scroll back to top"
           >
             <span>Back to top</span>
-            <ArrowUp className="w-3.5 h-3.5 text-[#F0A352]" />
+            <ArrowUp className="w-3.5 h-3.5" />
           </button>
         </div>
       </footer>

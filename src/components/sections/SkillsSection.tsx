@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   Code,
@@ -12,6 +12,143 @@ import {
 import SectionHeading from "@/components/ui/SectionHeading";
 import { portfolioData, SkillCategory } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
+
+function SkillCard({ category, index }: { category: SkillCategory; index: number }) {
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [tilt, setTilt] = useState({
+    rotateX: 0,
+    rotateY: 0,
+    glareX: 50,
+    glareY: 50,
+    isHovered: false,
+  });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -6.5;
+    const rotateY = ((x - centerX) / centerX) * 6.5;
+    const glareX = (x / rect.width) * 100;
+    const glareY = (y / rect.height) * 100;
+
+    setTilt({
+      rotateX,
+      rotateY,
+      glareX,
+      glareY,
+      isHovered: true,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({
+      rotateX: 0,
+      rotateY: 0,
+      glareX: 50,
+      glareY: 50,
+      isHovered: false,
+    });
+  };
+
+  const getCategoryIcon = (i: number) => {
+    switch (i) {
+      case 0:
+        return <Layers className="w-5 h-5 text-[#F0A352]" />;
+      case 1:
+        return <Code className="w-5 h-5 text-[#C96F3B]" />;
+      case 2:
+        return <Terminal className="w-5 h-5 text-[#777957]" />;
+      case 3:
+        return <Database className="w-5 h-5 text-[#9E472D]" />;
+      default:
+        return <GitBranch className="w-5 h-5 text-[#F0A352]" />;
+    }
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={`skill-discovery-card rounded-2xl p-6 sm:p-8 glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352] flex flex-col justify-between backdrop-blur-xl relative overflow-hidden will-change-transform ${
+        index === 0 ? "md:col-span-2 lg:col-span-1" : ""
+      }`}
+      style={{
+        transform: tilt.isHovered
+          ? `perspective(1000px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`
+          : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+        transition: tilt.isHovered ? "transform 0.12s ease-out" : "transform 0.5s ease-out",
+        boxShadow: tilt.isHovered
+          ? "0 20px 40px -15px rgba(201, 111, 59, 0.35), 0 0 25px rgba(240, 163, 82, 0.15)"
+          : "0 10px 25px -10px rgba(0, 0, 0, 0.5)",
+      }}
+    >
+      {/* 3D Dynamic Glare Reflection */}
+      {tilt.isHovered && (
+        <div
+          className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 rounded-2xl"
+          style={{
+            background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(240, 163, 82, 0.2) 0%, rgba(255, 232, 184, 0.06) 40%, transparent 65%)`,
+          }}
+        />
+      )}
+
+      {/* Top Flow Discovery Border Flare */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F0A352] to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
+
+      <div>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-3 rounded-xl bg-[#392820]/90 border border-[#C96F3B]/40 transition-transform duration-300 hover:scale-110">
+            {getCategoryIcon(index)}
+          </div>
+          <span className="text-xs font-mono text-[#F0A352] tracking-wider uppercase font-semibold">
+            {category.subtitle}
+          </span>
+        </div>
+
+        <h3 className="text-xl font-serif font-bold text-[#F5EFE5] mb-4 hover:text-[#F0A352] transition-colors">
+          {category.title}
+        </h3>
+
+        {/* Skill Items with Interactive Micro-Animations */}
+        <ul className="space-y-3 mb-6">
+          {category.skills.map((skill) => (
+            <li
+              key={skill.name}
+              className="skill-item-pill p-3 rounded-xl bg-[#201C19]/85 border border-[#C96F3B]/15 hover:border-[#F0A352]/50 hover:bg-[#2D1E16] transition-all duration-300 hover:translate-x-1"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-sm text-[#F5EFE5] font-medium">
+                  {skill.name}
+                </span>
+                <span className="text-[10px] font-mono text-[#F0A352] tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#392820]/80">
+                  Active
+                </span>
+              </div>
+              {skill.description && (
+                <p className="text-xs text-[#F5EFE5]/70 mt-1 font-sans font-light leading-relaxed">
+                  {skill.description}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Bottom Card Footer */}
+      <div className="pt-4 border-t border-[#C96F3B]/20 flex items-center justify-between text-xs font-mono text-[#F5EFE5]/50">
+        <span>Domain 0{index + 1}</span>
+        <span className="text-[#F0A352]/80 font-semibold">{category.skills.length} Technologies</span>
+      </div>
+    </div>
+  );
+}
 
 export default function SkillsSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -41,13 +178,23 @@ export default function SkillsSection() {
         });
       }
 
-      // 2. Individual Flow Discovery for Skill Cards
+      // 2. Upgraded 3D Spatial Assembly Reveal for Skill Cards
       const cards = cardsRef.current?.querySelectorAll(".skill-discovery-card");
       if (cards && cards.length > 0) {
-        cards.forEach((card) => {
-          gsap.fromTo(
+        cards.forEach((card, index) => {
+          const pills = card.querySelectorAll(".skill-item-pill");
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          });
+
+          tl.fromTo(
             card,
-            { opacity: 0, y: 55, scale: 0.94, rotateX: 6 },
+            { opacity: 0, y: 55, scale: 0.94, rotateX: 8 },
             {
               opacity: 1,
               y: 0,
@@ -55,34 +202,29 @@ export default function SkillsSection() {
               rotateX: 0,
               duration: 0.85,
               ease: "power2.out",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 86%",
-                toggleActions: "play none none reverse",
-              },
             }
           );
+
+          if (pills && pills.length > 0) {
+            tl.fromTo(
+              pills,
+              { opacity: 0, x: -15 },
+              {
+                opacity: 1,
+                x: 0,
+                duration: 0.45,
+                stagger: 0.06,
+                ease: "power2.out",
+              },
+              "-=0.4"
+            );
+          }
         });
       }
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
-
-  const getCategoryIcon = (index: number) => {
-    switch (index) {
-      case 0:
-        return <Layers className="w-5 h-5 text-[#F0A352]" />;
-      case 1:
-        return <Code className="w-5 h-5 text-[#C96F3B]" />;
-      case 2:
-        return <Terminal className="w-5 h-5 text-[#777957]" />;
-      case 3:
-        return <Database className="w-5 h-5 text-[#9E472D]" />;
-      default:
-        return <GitBranch className="w-5 h-5 text-[#F0A352]" />;
-    }
-  };
 
   return (
     <section
@@ -119,67 +261,13 @@ export default function SkillsSection() {
           description="A balanced stack centered on expressive user interfaces, strict typing, and maintainable architectures. Designed without false percentage meters."
         />
 
-        {/* Editorial Categories Grid with Individual Flow Discovery */}
+        {/* Editorial Categories Grid with Individual 3D Tilt Cards */}
         <div
           ref={cardsRef}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
         >
           {portfolioData.skillCategories.map((category: SkillCategory, index: number) => (
-            <div
-              key={category.title}
-              className={`skill-discovery-card rounded-2xl p-6 sm:p-8 glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352] transition-all duration-500 hover:shadow-2xl hover:shadow-[#C96F3B]/25 group flex flex-col justify-between backdrop-blur-xl relative overflow-hidden ${
-                index === 0 ? "md:col-span-2 lg:col-span-1" : ""
-              }`}
-            >
-              {/* Top Flow Discovery Border Flare */}
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F0A352] to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
-
-              <div>
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 rounded-xl bg-[#392820]/90 border border-[#C96F3B]/40 group-hover:border-[#F0A352] group-hover:scale-105 transition-all duration-300">
-                    {getCategoryIcon(index)}
-                  </div>
-                  <span className="text-xs font-mono text-[#F0A352] tracking-wider uppercase">
-                    {category.subtitle}
-                  </span>
-                </div>
-
-                <h3 className="text-xl font-serif font-bold text-[#F5EFE5] mb-4 group-hover:text-[#F0A352] transition-colors">
-                  {category.title}
-                </h3>
-
-                {/* Skill Items */}
-                <ul className="space-y-3 mb-6">
-                  {category.skills.map((skill) => (
-                    <li
-                      key={skill.name}
-                      className="p-3 rounded-xl bg-[#201C19]/80 border border-[#C96F3B]/15 hover:border-[#F0A352]/40 transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-sm text-[#F5EFE5] font-medium">
-                          {skill.name}
-                        </span>
-                        <span className="text-[10px] font-mono text-[#F0A352] tracking-wider uppercase">
-                          Active
-                        </span>
-                      </div>
-                      {skill.description && (
-                        <p className="text-xs text-[#F5EFE5]/65 mt-1 font-sans font-light leading-relaxed">
-                          {skill.description}
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Bottom Card Footer */}
-              <div className="pt-4 border-t border-[#C96F3B]/20 flex items-center justify-between text-xs font-mono text-[#F5EFE5]/50">
-                <span>Domain 0{index + 1}</span>
-                <span className="text-[#F0A352]/75">{category.skills.length} Technologies</span>
-              </div>
-            </div>
+            <SkillCard key={category.title} category={category} index={index} />
           ))}
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Sparkles, BookOpen, Heart } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -11,17 +11,47 @@ export default function AboutSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const bgImageRef = useRef<HTMLDivElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const contentRef = useRef<HTMLDivElement | null>(null);
+  const bioRef = useRef<HTMLDivElement | null>(null);
+  const learningRef = useRef<HTMLDivElement | null>(null);
+  const interestsRef = useRef<HTMLDivElement | null>(null);
+
+  const [tilt, setTilt] = useState({
+    rotateX: 0,
+    rotateY: 0,
+    glareX: 50,
+    glareY: 50,
+    isHovered: false,
+  });
+
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -6;
+    const rotateY = ((x - centerX) / centerX) * 6;
+    const glareX = (x / rect.width) * 100;
+    const glareY = (y / rect.height) * 100;
+
+    setTilt({ rotateX, rotateY, glareX, glareY, isHovered: true });
+  };
+
+  const handleCardMouseLeave = () => {
+    setTilt({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50, isHovered: false });
+  };
 
   useEffect(() => {
-    const { gsap } = initGSAP();
+    const { gsap, ScrollTrigger } = initGSAP();
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
 
     const ctx = gsap.context(() => {
-      // Background Cinematic Parallax
+      // 1. Background Cinematic Parallax
       if (bgImageRef.current && sectionRef.current) {
         gsap.to(bgImageRef.current, {
           yPercent: 18,
@@ -36,37 +66,34 @@ export default function AboutSection() {
         });
       }
 
-      // Card & Content Entrance
-      gsap.fromTo(
-        cardRef.current,
-        { opacity: 0, y: 60, scale: 0.95 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 1.2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 70%",
-          },
-        }
-      );
+      // 2. Smooth Progressive Card & Content Tracking Reveals
+      const revealItems = [
+        { el: cardRef.current, x: -40, start: "top 75%" },
+        { el: bioRef.current, x: 40, start: "top 72%" },
+        { el: learningRef.current, x: 35, start: "top 68%" },
+        { el: interestsRef.current, x: 30, start: "top 65%" },
+      ];
 
-      gsap.fromTo(
-        contentRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 65%",
-          },
-        }
-      );
+      revealItems.forEach(({ el, x, start }) => {
+        if (!el) return;
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 50, x, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            x: 0,
+            scale: 1,
+            duration: 1.0,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start,
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -108,9 +135,30 @@ export default function AboutSection() {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-          {/* Left Column: Studio Workspace Card */}
-          <div ref={cardRef} className="lg:col-span-5 relative">
-            <div className="relative rounded-2xl overflow-hidden glass-panel border border-[#C96F3B]/35 shadow-2xl shadow-black/70 group">
+          {/* Left Column: Studio Workspace Card with 3D Tilt */}
+          <div className="lg:col-span-5 relative">
+            <div
+              ref={cardRef}
+              onMouseMove={handleCardMouseMove}
+              onMouseLeave={handleCardMouseLeave}
+              className="relative rounded-2xl overflow-hidden glass-panel border border-[#C96F3B]/35 shadow-2xl shadow-black/70 group will-change-transform"
+              style={{
+                transform: tilt.isHovered
+                  ? `perspective(1000px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`
+                  : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+                transition: tilt.isHovered ? "transform 0.12s ease-out" : "transform 0.5s ease-out",
+              }}
+            >
+              {/* Specular glare */}
+              {tilt.isHovered && (
+                <div
+                  className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 rounded-2xl"
+                  style={{
+                    background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(240, 163, 82, 0.22) 0%, transparent 65%)`,
+                  }}
+                />
+              )}
+
               {/* Image Container */}
               <div className="relative h-80 sm:h-96 w-full overflow-hidden">
                 <Image
@@ -150,9 +198,12 @@ export default function AboutSection() {
           </div>
 
           {/* Right Column: Narrative & Pillars */}
-          <div ref={contentRef} className="lg:col-span-7 flex flex-col gap-7">
+          <div className="lg:col-span-7 flex flex-col gap-7">
             {/* Bio Paragraphs */}
-            <div className="space-y-4 p-6 sm:p-7 rounded-2xl glass-panel border border-[#C96F3B]/25 shadow-xl">
+            <div
+              ref={bioRef}
+              className="space-y-4 p-6 sm:p-7 rounded-2xl glass-panel border border-[#C96F3B]/25 shadow-xl transition-all duration-300 hover:border-[#F0A352]/40"
+            >
               {portfolioData.personal.bio.map((paragraph, idx) => (
                 <p
                   key={idx}
@@ -164,7 +215,10 @@ export default function AboutSection() {
             </div>
 
             {/* Current Learning Goals */}
-            <div className="p-6 sm:p-7 rounded-2xl glass-panel-warm border border-[#C96F3B]/30 shadow-xl">
+            <div
+              ref={learningRef}
+              className="p-6 sm:p-7 rounded-2xl glass-panel-warm border border-[#C96F3B]/30 shadow-xl transition-all duration-300 hover:border-[#F0A352]/50"
+            >
               <div className="flex items-center gap-2.5 text-xs font-mono text-[#F0A352] uppercase tracking-wider mb-4">
                 <BookOpen className="w-4 h-4" />
                 <span>Current Learning Expeditions</span>
@@ -183,7 +237,10 @@ export default function AboutSection() {
             </div>
 
             {/* Development Interests */}
-            <div className="p-5 rounded-2xl glass-panel border border-[#C96F3B]/20">
+            <div
+              ref={interestsRef}
+              className="p-5 rounded-2xl glass-panel border border-[#C96F3B]/20 transition-all duration-300 hover:border-[#F0A352]/40"
+            >
               <div className="flex items-center gap-2 text-xs font-mono text-[#F5EFE5]/70 uppercase tracking-wider mb-3">
                 <Heart className="w-3.5 h-3.5 text-[#C96F3B]" />
                 <span>Areas of Creative Focus</span>

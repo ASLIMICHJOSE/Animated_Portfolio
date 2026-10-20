@@ -28,13 +28,13 @@ export default function CinematicWorld3D() {
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
-      antialias: true,
+      antialias: false, // Antialias off at native resolution saves ~30% GPU shader cost
       powerPreference: "high-performance",
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2)); // Capped at 1.2 saves up to 60% fill-rate on high-DPI
+    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 1.05;
     container.appendChild(renderer.domElement);
 
     // Continuous 3D Camera Flight Path (Curved Spline)
@@ -140,8 +140,8 @@ export default function CinematicWorld3D() {
       scene.add(group);
     });
 
-    // 3D Swirling Autumn Leaf / Ember Particles along camera spline
-    const particleCount = 200;
+    // 3D Swirling Autumn Leaf / Ember Particles along camera spline (Optimized for low-end GPU)
+    const particleCount = 75;
     const particleGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
