@@ -136,17 +136,16 @@ export default function AboutSection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Left Column: Studio Workspace Card with 3D Tilt */}
-          <div className="lg:col-span-5 relative">
+          <div ref={cardRef} className="lg:col-span-5 relative w-full">
             <div
-              ref={cardRef}
               onMouseMove={handleCardMouseMove}
               onMouseLeave={handleCardMouseLeave}
-              className="relative rounded-2xl overflow-hidden glass-panel border border-[#C96F3B]/35 shadow-2xl shadow-black/70 group will-change-transform"
+              className="relative rounded-2xl overflow-hidden glass-panel border border-[#C96F3B]/35 shadow-2xl shadow-black/70 group"
               style={{
                 transform: tilt.isHovered
                   ? `perspective(1000px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`
                   : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
-                transition: tilt.isHovered ? "transform 0.12s ease-out" : "transform 0.5s ease-out",
+                transition: tilt.isHovered ? "transform 0.1s ease-out" : "transform 0.4s ease-out",
               }}
             >
               {/* Specular glare */}

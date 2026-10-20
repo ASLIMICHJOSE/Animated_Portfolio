@@ -137,9 +137,19 @@ export default function ContinuousSectionConduit() {
       strokeDashoffset: pathLength,
     });
 
-    // Position tracer head immediately at initial point
+    // Pre-compute high-resolution Lookup Table (LUT) for O(1) instant position lookup
+    const lutSteps = 120;
+    const lut: { x: number; y: number }[] = [];
     if (path.getPointAtLength) {
-      const startPoint = path.getPointAtLength(0);
+      for (let i = 0; i <= lutSteps; i++) {
+        const pt = path.getPointAtLength((i / lutSteps) * pathLength);
+        lut.push({ x: Number(pt.x.toFixed(1)), y: Number(pt.y.toFixed(1)) });
+      }
+    }
+
+    // Position tracer head immediately at initial point
+    if (lut.length > 0) {
+      const startPoint = lut[0];
       if (tracerHeadRef.current) {
         tracerHeadRef.current.setAttribute("cx", String(startPoint.x));
         tracerHeadRef.current.setAttribute("cy", String(startPoint.y));
@@ -150,12 +160,14 @@ export default function ContinuousSectionConduit() {
       }
     }
 
+    const activeNodeIdRef = { current: "hero" };
+
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: "#main-content",
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.6,
+        scrub: true,
         onUpdate: (self) => {
           const currentOffset = (1 - self.progress) * pathLength;
           path.style.strokeDashoffset = String(currentOffset);
@@ -163,16 +175,25 @@ export default function ContinuousSectionConduit() {
             glowPath.style.strokeDashoffset = String(currentOffset);
           }
 
-          // Move the energy tracer along the unbroken path
-          if (path.getPointAtLength) {
-            const point = path.getPointAtLength(pathLength - currentOffset);
+          // Instant O(1) LUT lerp: Zero expensive polynomial math during scroll!
+          if (lut.length > 0) {
+            const idxFloat = self.progress * lutSteps;
+            const idx0 = Math.min(lutSteps, Math.floor(idxFloat));
+            const idx1 = Math.min(lutSteps, idx0 + 1);
+            const fraction = idxFloat - idx0;
+
+            const pt0 = lut[idx0];
+            const pt1 = lut[idx1] || pt0;
+            const x = pt0.x + (pt1.x - pt0.x) * fraction;
+            const y = pt0.y + (pt1.y - pt0.y) * fraction;
+
             if (tracerHeadRef.current) {
-              tracerHeadRef.current.setAttribute("cx", String(point.x));
-              tracerHeadRef.current.setAttribute("cy", String(point.y));
+              tracerHeadRef.current.setAttribute("cx", String(x));
+              tracerHeadRef.current.setAttribute("cy", String(y));
             }
             if (tracerGlowRef.current) {
-              tracerGlowRef.current.setAttribute("cx", String(point.x));
-              tracerGlowRef.current.setAttribute("cy", String(point.y));
+              tracerGlowRef.current.setAttribute("cx", String(x));
+              tracerGlowRef.current.setAttribute("cy", String(y));
             }
 
             const sections = [
@@ -191,7 +212,10 @@ export default function ContinuousSectionConduit() {
                 break;
               }
             }
-            setActiveNodeId(active);
+            if (active !== activeNodeIdRef.current) {
+              activeNodeIdRef.current = active;
+              setActiveNodeId(active);
+            }
           }
         },
       });

@@ -278,19 +278,14 @@ export default function CinematicWorld3D() {
         scene.fog.color.lerp(fogColor, 0.05);
       }
 
-      // Ambient Leaf Particle Drift
-      const posAttr = particleGeo.attributes.position as THREE.BufferAttribute;
-      for (let i = 0; i < particleCount; i++) {
-        let py = posAttr.getY(i) + particleVels[i].y;
-        let px = posAttr.getX(i) + Math.sin(elapsedTime + i) * 0.03;
-        let pz = posAttr.getZ(i) + particleVels[i].z;
-
-        // Reset if drifted too far below
-        if (py < -30) py = 50;
-
-        posAttr.setXYZ(i, px, py, pz);
+      // Ambient Leaf Particle Drift (Zero WebGL buffer re-upload, 100% GPU transform)
+      if (particles) {
+        particles.position.y -= 0.035;
+        if (particles.position.y < -40) {
+          particles.position.y = 15;
+        }
+        particles.rotation.y += 0.0006;
       }
-      posAttr.needsUpdate = true;
 
       renderer.render(scene, camera);
       animationId = requestAnimationFrame(animate);

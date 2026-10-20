@@ -92,12 +92,23 @@ export default function FallingLeaves() {
   const [isDraggingBlower, setIsDraggingBlower] = useState(false);
 
   // References for high-performance 60FPS loop
+  const settledCountRef = useRef(0);
+  const lastReportedCountRef = useRef(0);
+  const isFullyCoveredRef = useRef(false);
+  const isSidePanelOpenRef = useRef(false);
   const isBlowerEquippedRef = useRef(false);
   const isBlowingRef = useRef(true);
   const aimModeRef = useRef<"cursor" | "manual">("cursor");
   const manualAngleDegRef = useRef(-135);
   const isTurboRef = useRef(false);
   const turboTriggerRef = useRef(false);
+
+  useEffect(() => {
+    isSidePanelOpenRef.current = isSidePanelOpen;
+    if (isSidePanelOpen) {
+      setPiledCount(settledCountRef.current);
+    }
+  }, [isSidePanelOpen]);
 
   useEffect(() => {
     isBlowerEquippedRef.current = isBlowerEquipped;
@@ -196,8 +207,8 @@ export default function FallingLeaves() {
       registerActivity();
 
       // When user scrolls down out of Hero:
-      // All settled leaves dislodge smoothly and cascade down!
-      if (currentScrollY > 70) {
+      // Dislodge settled leaves if any exist
+      if (currentScrollY > 70 && settledCountRef.current > 0) {
         cascadeSettledLeaves();
       }
     };
@@ -325,8 +336,10 @@ export default function FallingLeaves() {
 
     // Cascade all settled leaves when page scrolls or user blasts them
     const cascadeSettledLeaves = () => {
+      let hadSettled = false;
       leaves.forEach((leaf) => {
         if (leaf.isSettled) {
+          hadSettled = true;
           leaf.isSettled = false;
           leaf.speedY = Math.random() * 3.5 + 2.5; // downward burst
           leaf.speedX = (Math.random() - 0.5) * 4.0;
@@ -334,8 +347,11 @@ export default function FallingLeaves() {
           leaf.flipSpeed = Math.random() * 0.08 + 0.04;
         }
       });
-      setPiledCount(0);
-      setIsFullyCovered(false);
+      settledCountRef.current = 0;
+      if (hadSettled || isFullyCoveredRef.current) {
+        isFullyCoveredRef.current = false;
+        setIsFullyCovered(false);
+      }
     };
 
     // Draw Maple Leaf shape
@@ -801,9 +817,18 @@ export default function FallingLeaves() {
         ctx.restore();
       }
 
-      setPiledCount(settledCount);
+      settledCountRef.current = settledCount;
       const coveredNow = settledCount >= FULL_COVER_THRESHOLD;
-      setIsFullyCovered(coveredNow);
+      if (coveredNow !== isFullyCoveredRef.current) {
+        isFullyCoveredRef.current = coveredNow;
+        setIsFullyCovered(coveredNow);
+      }
+
+      // Live counter in drawer updates only when visitor has the panel open
+      if (isSidePanelOpenRef.current && settledCount !== lastReportedCountRef.current) {
+        lastReportedCountRef.current = settledCount;
+        setPiledCount(settledCount);
+      }
 
       // 3. DRAW BLOWER MACHINE (Only if equipped/visible)
       if (blower.opacity > 0.01) {

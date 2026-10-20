@@ -55,23 +55,24 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
   };
 
   return (
-    <article
-      ref={cardRef}
-      tabIndex={0}
-      aria-label={`Project: ${project.title}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="project-discovery-card group relative rounded-2xl overflow-hidden glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352] flex flex-col focus:outline-none focus:ring-2 focus:ring-[#F0A352] will-change-transform"
-      style={{
-        transform: tilt.isHovered
-          ? `perspective(1000px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`
-          : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
-        transition: tilt.isHovered ? "transform 0.12s ease-out" : "transform 0.5s ease-out",
-        boxShadow: tilt.isHovered
-          ? "0 20px 40px -15px rgba(201, 111, 59, 0.35), 0 0 25px rgba(240, 163, 82, 0.15)"
-          : "0 10px 25px -10px rgba(0, 0, 0, 0.5)",
-      }}
-    >
+    <div className="project-discovery-card w-full h-full flex flex-col">
+      <article
+        ref={cardRef}
+        tabIndex={0}
+        aria-label={`Project: ${project.title}`}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="group relative rounded-2xl overflow-hidden glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352] flex flex-col h-full focus:outline-none focus:ring-2 focus:ring-[#F0A352]"
+        style={{
+          transform: tilt.isHovered
+            ? `perspective(1000px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`
+            : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+          transition: tilt.isHovered ? "transform 0.1s ease-out" : "transform 0.4s ease-out",
+          boxShadow: tilt.isHovered
+            ? "0 20px 40px -15px rgba(201, 111, 59, 0.35), 0 0 25px rgba(240, 163, 82, 0.15)"
+            : "0 10px 25px -10px rgba(0, 0, 0, 0.5)",
+        }}
+      >
       {/* Specular 3D Holographic Glare Layer */}
       {tilt.isHovered && (
         <div
@@ -184,5 +185,6 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         </div>
       </div>
     </article>
-  );
+  </div>
+);
 }

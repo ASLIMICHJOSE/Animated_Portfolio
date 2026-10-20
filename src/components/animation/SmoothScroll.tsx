@@ -17,32 +17,34 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       return;
     }
 
-    const { ScrollTrigger } = initGSAP();
+    const { gsap, ScrollTrigger } = initGSAP();
 
+    // Ultra-smooth, zero-lag linear interpolation (lerp) momentum scroll
     const lenis = new Lenis({
-      duration: 1.35,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.085, // Instantaneous, organic tracking without sluggish input delay or inertia drag
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 1.05,
-      touchMultiplier: 1.5,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.0,
+      syncTouch: false,
       infinite: false,
+      autoResize: true,
     });
 
     window.__lenis = lenis;
 
-    // Connect Lenis to GSAP ScrollTrigger
-    lenis.on("scroll", () => {
-      ScrollTrigger.update();
-    });
+    // Direct synchronization: link Lenis to ScrollTrigger update
+    lenis.on("scroll", ScrollTrigger.update);
 
-    let rafId: number;
-    function raf(time: number) {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    }
-    rafId = requestAnimationFrame(raf);
+    // Direct integration with GSAP ticker (Zero out-of-phase jitter or frame drops)
+    const updateTicker = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+
+    gsap.ticker.add(updateTicker);
+    // Intelligent lag smoothing: absorbs momentary GPU/CPU micro-stalls without jumping
+    gsap.ticker.lagSmoothing(500, 33);
 
     // Intercept in-page hash anchor clicks to smoothly scroll via Lenis
     const handleAnchorClick = (e: MouseEvent) => {
@@ -55,7 +57,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
           e.preventDefault();
           lenis.scrollTo(element as HTMLElement, {
             offset: -30,
-            duration: 1.4,
+            duration: 1.0,
           });
         }
       }
@@ -64,7 +66,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     document.addEventListener("click", handleAnchorClick);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      gsap.ticker.remove(updateTicker);
       document.removeEventListener("click", handleAnchorClick);
       lenis.destroy();
       delete window.__lenis;

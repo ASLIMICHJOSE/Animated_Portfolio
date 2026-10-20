@@ -147,21 +147,21 @@ export default function ContactSection() {
         />
 
         {/* Central Contact Card with 3D Tilt */}
-        <div
-          ref={cardRef}
-          onMouseMove={handleCardMouseMove}
-          onMouseLeave={handleCardMouseLeave}
-          className="p-8 sm:p-12 rounded-3xl glass-panel border border-[#C96F3B]/40 shadow-2xl shadow-black/70 relative overflow-hidden text-center backdrop-blur-2xl will-change-transform"
-          style={{
-            transform: tilt.isHovered
-              ? `perspective(1000px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`
-              : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
-            transition: tilt.isHovered ? "transform 0.12s ease-out" : "transform 0.5s ease-out",
-            boxShadow: tilt.isHovered
-              ? "0 25px 50px -15px rgba(201, 111, 59, 0.4), 0 0 30px rgba(240, 163, 82, 0.2)"
-              : "0 10px 25px -10px rgba(0, 0, 0, 0.7)",
-          }}
-        >
+        <div ref={cardRef} className="w-full relative">
+          <div
+            onMouseMove={handleCardMouseMove}
+            onMouseLeave={handleCardMouseLeave}
+            className="p-8 sm:p-12 rounded-3xl glass-panel border border-[#C96F3B]/40 shadow-2xl shadow-black/70 relative overflow-hidden text-center"
+            style={{
+              transform: tilt.isHovered
+                ? `perspective(1000px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`
+                : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+              transition: tilt.isHovered ? "transform 0.1s ease-out" : "transform 0.4s ease-out",
+              boxShadow: tilt.isHovered
+                ? "0 25px 50px -15px rgba(201, 111, 59, 0.4), 0 0 30px rgba(240, 163, 82, 0.2)"
+                : "0 10px 25px -10px rgba(0, 0, 0, 0.7)",
+            }}
+          >
           {/* Specular glare */}
           {tilt.isHovered && (
             <div
@@ -254,6 +254,7 @@ export default function ContactSection() {
           </div>
         </div>
       </div>
+    </div>
 
       {/* Footer Navigation & Copyright */}
       <footer className="relative z-10 w-full pt-16 pb-8 border-t border-[#C96F3B]/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#F5EFE5]/50">
