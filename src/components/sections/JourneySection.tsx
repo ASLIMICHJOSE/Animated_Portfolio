@@ -1,0 +1,143 @@
+"use client";
+
+import React, { useEffect, useRef } from "react";
+import Image from "next/image";
+import { Train, CheckCircle2, Milestone, Sparkles } from "lucide-react";
+import SectionHeading from "@/components/ui/SectionHeading";
+import { portfolioData, JourneyMilestone } from "@/data/portfolio";
+import { initGSAP } from "@/lib/animations";
+
+export default function JourneySection() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const timelineRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const { gsap } = initGSAP();
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      const milestones = timelineRef.current?.querySelectorAll(".milestone-card");
+      if (milestones && milestones.length > 0) {
+        gsap.fromTo(
+          milestones,
+          { opacity: 0, y: 45 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            stagger: 0.2,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: timelineRef.current,
+              start: "top 75%",
+            },
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section
+      id="journey"
+      ref={sectionRef}
+      className="relative py-28 sm:py-36 px-6 sm:px-8 bg-[#201C19] border-t border-[#C96F3B]/15 overflow-hidden"
+    >
+      {/* Background Anime Railway Scene with Atmospheric Darkening */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+        <Image
+          src="/images/journey-autumn-train.jpg"
+          alt="Anime autumn railway landscape"
+          fill
+          sizes="100vw"
+          className="object-cover object-center filter saturate-75 brightness-75"
+        />
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-b from-[#201C19] via-[#201C19]/90 to-[#201C19] pointer-events-none" />
+
+      <div className="relative z-10 max-w-5xl mx-auto">
+        <SectionHeading
+          number="ACT 04 / CHRONICLE"
+          kanjiSubtitle="成長の軌跡"
+          title="The Developer Odyssey"
+          highlightWord="Odyssey"
+          description="A visual narrative mapping the progression from foundational curiosity to modern fullstack architecture and cinematic motion."
+        />
+
+        {/* Timeline Container */}
+        <div ref={timelineRef} className="relative mt-16 sm:mt-20">
+          {/* Central Glowing Autumn Railway Line */}
+          <div className="hidden md:block absolute left-1/2 top-4 bottom-8 -translate-x-1/2 w-[2px] bg-gradient-to-b from-[#F0A352] via-[#C96F3B] to-[#392820]" />
+
+          <div className="space-y-12 sm:space-y-16">
+            {portfolioData.journey.map((item: JourneyMilestone, index: number) => {
+              const isEven = index % 2 === 0;
+
+              return (
+                <div
+                  key={item.period}
+                  className={`milestone-card relative flex flex-col md:flex-row items-center gap-8 ${
+                    isEven ? "md:flex-row-reverse" : ""
+                  }`}
+                >
+                  {/* Content Card */}
+                  <div className="w-full md:w-[calc(50%-2.5rem)]">
+                    <div className="p-6 sm:p-8 rounded-2xl glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352]/60 transition-all duration-300 hover:shadow-2xl hover:shadow-[#C96F3B]/15 group">
+                      {/* Chapter Badge */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="px-3 py-1 rounded-full text-xs font-mono font-medium text-[#F0A352] bg-[#392820] border border-[#C96F3B]/30">
+                          {item.period}
+                        </span>
+                        <span className="text-xs font-mono text-[#F5EFE5]/40">
+                          Milestone 0{index + 1}
+                        </span>
+                      </div>
+
+                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#F5EFE5] group-hover:text-[#F0A352] transition-colors mb-1">
+                        {item.title}
+                      </h3>
+
+                      <h4 className="text-xs sm:text-sm font-sans font-medium text-[#C96F3B] mb-4">
+                        {item.subtitle}
+                      </h4>
+
+                      <p className="text-sm sm:text-base text-[#F5EFE5]/75 font-sans font-light leading-relaxed mb-6">
+                        {item.description}
+                      </p>
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2 pt-4 border-t border-[#C96F3B]/15">
+                        {item.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-xs font-mono px-2.5 py-1 rounded bg-[#201C19]/80 text-[#F5EFE5]/80 border border-[#C96F3B]/20"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Center Node / Lantern Point */}
+                  <div className="hidden md:flex relative z-10 w-12 h-12 rounded-full bg-[#201C19] border-2 border-[#F0A352] items-center justify-center shadow-lg shadow-[#F0A352]/30 group">
+                    <div className="w-4 h-4 rounded-full bg-gradient-to-r from-[#F0A352] to-[#C96F3B] animate-pulse" />
+                  </div>
+
+                  {/* Spacer for symmetry on desktop */}
+                  <div className="hidden md:block w-[calc(50%-2.5rem)]" />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
