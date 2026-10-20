@@ -2,13 +2,13 @@
 
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
-import { Train, CheckCircle2, Milestone, Sparkles } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { portfolioData, JourneyMilestone } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
 
 export default function JourneySection() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const bgImageRef = useRef<HTMLDivElement | null>(null);
   const timelineRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -19,14 +19,31 @@ export default function JourneySection() {
     }
 
     const ctx = gsap.context(() => {
+      // Parallax scroll on anime railway background
+      if (bgImageRef.current && sectionRef.current) {
+        gsap.to(bgImageRef.current, {
+          yPercent: 20,
+          scale: 1.08,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
+
+      // Staggered Timeline Cards Entrance
       const milestones = timelineRef.current?.querySelectorAll(".milestone-card");
       if (milestones && milestones.length > 0) {
         gsap.fromTo(
           milestones,
-          { opacity: 0, y: 45 },
+          { opacity: 0, y: 50, scale: 0.96 },
           {
             opacity: 1,
             y: 0,
+            scale: 1,
             duration: 0.9,
             stagger: 0.2,
             ease: "power2.out",
@@ -46,22 +63,28 @@ export default function JourneySection() {
     <section
       id="journey"
       ref={sectionRef}
-      className="relative py-28 sm:py-36 px-6 sm:px-8 bg-[#201C19] border-t border-[#C96F3B]/15 overflow-hidden"
+      className="relative min-h-screen py-28 sm:py-36 px-6 sm:px-8 overflow-hidden flex items-center bg-[#201C19]"
     >
-      {/* Background Anime Railway Scene with Atmospheric Darkening */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+      {/* Dynamic Layer 0: Full-Bleed Anime Railway Scene Background */}
+      <div
+        ref={bgImageRef}
+        className="absolute inset-0 w-full h-[120%] -top-[10%] pointer-events-none will-change-transform"
+      >
         <Image
           src="/images/journey-autumn-train.jpg"
-          alt="Anime autumn railway landscape"
+          alt="Anime autumn railway tracks stretching into misty hills"
           fill
           sizes="100vw"
-          className="object-cover object-center filter saturate-75 brightness-75"
+          className="object-cover object-center brightness-[0.74] contrast-[1.05]"
         />
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-b from-[#201C19] via-[#201C19]/90 to-[#201C19] pointer-events-none" />
+      {/* Dynamic Layer 1: Atmospheric Sunset Lighting & Vignette */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#201C19] via-[#201C19]/65 to-[#201C19] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(240,163,82,0.18)_0%,transparent_65%)] pointer-events-none" />
 
-      <div className="relative z-10 max-w-5xl mx-auto">
+      {/* Dynamic Layer 2: Editorial Journey Timeline */}
+      <div className="relative z-10 max-w-5xl mx-auto w-full">
         <SectionHeading
           number="ACT 04 / CHRONICLE"
           kanjiSubtitle="成長の軌跡"
@@ -73,7 +96,7 @@ export default function JourneySection() {
         {/* Timeline Container */}
         <div ref={timelineRef} className="relative mt-16 sm:mt-20">
           {/* Central Glowing Autumn Railway Line */}
-          <div className="hidden md:block absolute left-1/2 top-4 bottom-8 -translate-x-1/2 w-[2px] bg-gradient-to-b from-[#F0A352] via-[#C96F3B] to-[#392820]" />
+          <div className="hidden md:block absolute left-1/2 top-4 bottom-8 -translate-x-1/2 w-[2px] bg-gradient-to-b from-[#F0A352] via-[#C96F3B] to-[#392820] shadow-lg shadow-[#F0A352]/20" />
 
           <div className="space-y-12 sm:space-y-16">
             {portfolioData.journey.map((item: JourneyMilestone, index: number) => {
@@ -88,13 +111,13 @@ export default function JourneySection() {
                 >
                   {/* Content Card */}
                   <div className="w-full md:w-[calc(50%-2.5rem)]">
-                    <div className="p-6 sm:p-8 rounded-2xl glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352]/60 transition-all duration-300 hover:shadow-2xl hover:shadow-[#C96F3B]/15 group">
+                    <div className="p-6 sm:p-8 rounded-2xl glass-panel border border-[#C96F3B]/35 hover:border-[#F0A352] transition-all duration-300 hover:shadow-2xl hover:shadow-[#C96F3B]/20 group backdrop-blur-xl">
                       {/* Chapter Badge */}
                       <div className="flex items-center justify-between mb-3">
                         <span className="px-3 py-1 rounded-full text-xs font-mono font-medium text-[#F0A352] bg-[#392820] border border-[#C96F3B]/30">
                           {item.period}
                         </span>
-                        <span className="text-xs font-mono text-[#F5EFE5]/40">
+                        <span className="text-xs font-mono text-[#F5EFE5]/50">
                           Milestone 0{index + 1}
                         </span>
                       </div>
@@ -107,16 +130,16 @@ export default function JourneySection() {
                         {item.subtitle}
                       </h4>
 
-                      <p className="text-sm sm:text-base text-[#F5EFE5]/75 font-sans font-light leading-relaxed mb-6">
+                      <p className="text-sm sm:text-base text-[#F5EFE5]/80 font-sans font-light leading-relaxed mb-6">
                         {item.description}
                       </p>
 
                       {/* Tags */}
-                      <div className="flex flex-wrap gap-2 pt-4 border-t border-[#C96F3B]/15">
+                      <div className="flex flex-wrap gap-2 pt-4 border-t border-[#C96F3B]/20">
                         {item.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="text-xs font-mono px-2.5 py-1 rounded bg-[#201C19]/80 text-[#F5EFE5]/80 border border-[#C96F3B]/20"
+                            className="text-xs font-mono px-2.5 py-1 rounded bg-[#201C19]/80 text-[#F5EFE5]/85 border border-[#C96F3B]/25"
                           >
                             {tag}
                           </span>
@@ -126,7 +149,7 @@ export default function JourneySection() {
                   </div>
 
                   {/* Center Node / Lantern Point */}
-                  <div className="hidden md:flex relative z-10 w-12 h-12 rounded-full bg-[#201C19] border-2 border-[#F0A352] items-center justify-center shadow-lg shadow-[#F0A352]/30 group">
+                  <div className="hidden md:flex relative z-10 w-12 h-12 rounded-full bg-[#201C19] border-2 border-[#F0A352] items-center justify-center shadow-lg shadow-[#F0A352]/40 group">
                     <div className="w-4 h-4 rounded-full bg-gradient-to-r from-[#F0A352] to-[#C96F3B] animate-pulse" />
                   </div>
 
