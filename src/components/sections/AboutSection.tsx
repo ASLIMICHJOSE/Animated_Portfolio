@@ -4,7 +4,6 @@ import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { Sparkles, BookOpen, Heart } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
-import SceneFlowPrompt from "@/components/ui/SceneFlowPrompt";
 import { portfolioData } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
 
@@ -86,7 +85,7 @@ export default function AboutSection() {
       >
         <Image
           src="/images/about-autumn-garden.jpg"
-          alt="Tranquil traditional Japanese engawa overlooking an autumn maple garden"
+          alt="Tranquil traditional veranda overlooking an autumn maple garden"
           fill
           sizes="100vw"
           className="object-cover object-center brightness-[0.75] contrast-[1.05]"
@@ -102,35 +101,35 @@ export default function AboutSection() {
       <div className="relative z-10 max-w-7xl mx-auto w-full">
         <SectionHeading
           number="ACT 01 / ESSENCE"
-          kanjiSubtitle="自己紹介と理念"
+          categoryLabel="Philosophy & Profile"
           title="Bridging Narrative & Structure"
           highlightWord="Structure"
-          description="Crafting digital environments that marry the emotional warmth of anime cinematography with the rigorous discipline of modern web engineering."
+          description="Crafting digital environments that marry the emotional warmth of cinematic visuals with the rigorous discipline of modern web engineering."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-          {/* Left Column: Anime Visual Workspace Card */}
+          {/* Left Column: Studio Workspace Card */}
           <div ref={cardRef} className="lg:col-span-5 relative">
             <div className="relative rounded-2xl overflow-hidden glass-panel border border-[#C96F3B]/35 shadow-2xl shadow-black/70 group">
               {/* Image Container */}
               <div className="relative h-80 sm:h-96 w-full overflow-hidden">
                 <Image
                   src="/images/project-autumn-workspace.jpg"
-                  alt="Anime aesthetic developer desk bathed in autumn golden sunlight"
+                  alt="Developer desk bathed in autumn golden sunlight"
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#201C19] via-transparent to-transparent opacity-90" />
 
-                {/* Corner Golden Crest */}
+                {/* Corner Crest */}
                 <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#201C19]/85 backdrop-blur-md border border-[#F0A352]/40 text-xs font-mono text-[#F0A352] flex items-center gap-1.5 shadow-md">
                   <Sparkles className="w-3 h-3 text-[#F0A352]" />
-                  <span>The Studio Space</span>
+                  <span>The Creative Studio</span>
                 </div>
               </div>
 
-              {/* Floating Quote Block */}
+              {/* Quote Block */}
               <div className="p-6 bg-[#201C19]/95 backdrop-blur-md border-t border-[#C96F3B]/20">
                 <blockquote className="font-serif italic text-sm sm:text-base text-[#F5EFE5]/90 mb-3 leading-relaxed">
                   &ldquo;{portfolioData.personal.philosophy}&rdquo;
@@ -139,8 +138,8 @@ export default function AboutSection() {
                   <span className="text-xs font-mono text-[#F0A352]">
                     — {portfolioData.personal.name}
                   </span>
-                  <span className="text-xs font-serif text-[#F5EFE5]/50">
-                    {portfolioData.personal.kanjiName}
+                  <span className="text-xs font-mono text-[#F5EFE5]/50 uppercase tracking-widest">
+                    Perspective
                   </span>
                 </div>
               </div>
@@ -202,14 +201,6 @@ export default function AboutSection() {
             </div>
           </div>
         </div>
-
-        {/* First-Person POV Flow Trigger to Chapter 02 */}
-        <SceneFlowPrompt
-          targetId="skills"
-          chapterNumber="CHAPTER 02"
-          destinationName="The Hillside Observatory"
-          japaneseDestination="展望台へ"
-        />
       </div>
     </section>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Sparkles, RotateCcw, Eye, EyeOff } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 interface Leaf {
   id: number;
@@ -22,8 +22,8 @@ interface Leaf {
 }
 
 interface SettledLeaf {
-  relX: number; // relative to bucket center
-  relY: number; // height inside bucket
+  relX: number;
+  relY: number;
   size: number;
   angle: number;
   color: string;
@@ -54,9 +54,7 @@ const AUTUMN_COLORS = [
 export default function FallingLeaves() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [collectedCount, setCollectedCount] = useState(0);
-  const [basketActive, setBasketActive] = useState(true);
-  const [milestoneText, setMilestoneText] = useState<string | null>(null);
-  const collectedCountRef = useRef(0);
+  const [isDragging, setIsDragging] = useState(false);
   const releaseTriggerRef = useRef(false);
 
   useEffect(() => {
@@ -77,38 +75,92 @@ export default function FallingLeaves() {
       if (!canvas) return;
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      dockX = width - 110;
+      dockY = height - 80;
     };
 
     window.addEventListener("resize", handleResize, { passive: true });
 
+    // Docked coordinates on the side
+    let dockX = width - 110;
+    let dockY = height - 80;
+
     // Bucket physics variables
     const bucket = {
-      x: width * 0.5,
-      y: height - 60,
-      targetX: width * 0.5,
-      width: 105,
+      x: dockX,
+      y: dockY,
+      targetX: dockX,
+      targetY: dockY,
+      width: 100,
       height: 65,
       vx: 0,
+      vy: 0,
       tilt: 0,
       bounceY: 0,
       bounceVy: 0,
+      isHeld: false,
     };
 
-    let isMouseActive = false;
+    let pointerX = 0;
+    let pointerY = 0;
+
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      let cx = 0;
+      let cy = 0;
+      if ("touches" in e && e.touches.length > 0) {
+        cx = e.touches[0].clientX;
+        cy = e.touches[0].clientY;
+      } else if ("clientX" in e) {
+        cx = (e as MouseEvent).clientX;
+        cy = (e as MouseEvent).clientY;
+      }
+
+      // Check if clicked inside or near bucket
+      const dist = Math.hypot(cx - bucket.x, cy - bucket.y);
+      if (dist < 75) {
+        bucket.isHeld = true;
+        setIsDragging(true);
+        pointerX = cx;
+        pointerY = cy;
+      }
+    };
 
     const handlePointerMove = (e: MouseEvent | TouchEvent) => {
-      isMouseActive = true;
-      let clientX = 0;
+      let cx = 0;
+      let cy = 0;
       if ("touches" in e && e.touches.length > 0) {
-        clientX = e.touches[0].clientX;
+        cx = e.touches[0].clientX;
+        cy = e.touches[0].clientY;
       } else if ("clientX" in e) {
-        clientX = (e as MouseEvent).clientX;
+        cx = (e as MouseEvent).clientX;
+        cy = (e as MouseEvent).clientY;
       }
-      bucket.targetX = Math.max(bucket.width / 2 + 10, Math.min(width - bucket.width / 2 - 10, clientX));
+      pointerX = cx;
+      pointerY = cy;
+
+      if (bucket.isHeld) {
+        bucket.targetX = Math.max(bucket.width / 2 + 10, Math.min(width - bucket.width / 2 - 10, cx));
+        bucket.targetY = Math.max(bucket.height + 20, Math.min(height - 40, cy));
+      }
     };
 
-    window.addEventListener("mousemove", handlePointerMove, { passive: true });
+    const handlePointerUp = () => {
+      if (bucket.isHeld) {
+        bucket.isHeld = false;
+        setIsDragging(false);
+        // Gently return towards side dock
+        bucket.targetX = dockX;
+        bucket.targetY = dockY;
+      }
+    };
+
+    window.addEventListener("mousedown", handlePointerDown);
+    window.addEventListener("mousemove", handlePointerMove);
+    window.addEventListener("mouseup", handlePointerUp);
+
+    window.addEventListener("touchstart", handlePointerDown, { passive: true });
     window.addEventListener("touchmove", handlePointerMove, { passive: true });
+    window.addEventListener("touchend", handlePointerUp);
 
     // Active falling leaves
     const isMobile = width < 768;
@@ -137,7 +189,7 @@ export default function FallingLeaves() {
     let settledLeaves: SettledLeaf[] = [];
     let particles: Particle[] = [];
 
-    // Draw Japanese Maple Leaf
+    // Draw Maple Leaf
     const drawMapleLeaf = (
       context: CanvasRenderingContext2D,
       size: number,
@@ -173,7 +225,7 @@ export default function FallingLeaves() {
       context.restore();
     };
 
-    // Draw Japanese Woven Bamboo / Wood Bucket
+    // Draw Japanese Woven Wood Bucket
     const drawBucket = (
       context: CanvasRenderingContext2D,
       bx: number,
@@ -191,13 +243,13 @@ export default function FallingLeaves() {
       const halfTop = topW / 2;
       const halfBot = botW / 2;
 
-      // Drop shadow underneath bucket
+      // Drop shadow
       context.beginPath();
       context.ellipse(0, bh + 4, halfBot + 6, 8, 0, 0, Math.PI * 2);
-      context.fillStyle = "rgba(0,0,0,0.45)";
+      context.fillStyle = "rgba(0,0,0,0.5)";
       context.fill();
 
-      // Bucket Wooden Body (Tapered)
+      // Bucket Wooden Body
       context.beginPath();
       context.moveTo(-halfTop, 0);
       context.lineTo(halfTop, 0);
@@ -205,7 +257,6 @@ export default function FallingLeaves() {
       context.lineTo(-halfBot, bh);
       context.closePath();
 
-      // Wood Grain Gradient
       const woodGrad = context.createLinearGradient(-halfTop, 0, halfTop, 0);
       woodGrad.addColorStop(0, "#2D1E16");
       woodGrad.addColorStop(0.2, "#4A3326");
@@ -231,7 +282,7 @@ export default function FallingLeaves() {
       drawBand(0.35);
       drawBand(0.75);
 
-      // Render Collected Leaves Inside Bucket
+      // Render Collected Leaves Inside & Overfilling Bucket
       for (const leaf of settledLeaves) {
         context.save();
         context.translate(leaf.relX, leaf.relY);
@@ -249,12 +300,21 @@ export default function FallingLeaves() {
       context.lineWidth = 2;
       context.stroke();
 
-      // Japanese Kanji Emblem on Bucket Front: 「秋」 (Autumn)
-      context.font = "bold 13px 'Cinzel', serif";
-      context.fillStyle = "rgba(240, 163, 82, 0.75)";
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      context.fillText("秋", 0, bh * 0.55);
+      // Polished Brass Diamond Emblem
+      context.save();
+      context.translate(0, bh * 0.55);
+      context.rotate(Math.PI / 4);
+      context.fillStyle = "#F0A352";
+      context.fillRect(-5, -5, 10, 10);
+      context.restore();
+
+      // Hint badge when resting at dock
+      if (!bucket.isHeld && Math.hypot(bucket.x - dockX, bucket.y - dockY) < 15) {
+        context.font = "500 10px 'Plus Jakarta Sans', sans-serif";
+        context.fillStyle = "rgba(240, 163, 82, 0.85)";
+        context.textAlign = "center";
+        context.fillText("Drag bucket", 0, -18);
+      }
 
       context.restore();
     };
@@ -264,17 +324,16 @@ export default function FallingLeaves() {
       time += 1;
       ctx.clearRect(0, 0, width, height);
 
-      // Handle Leaf Release if user clicks "Release"
+      // Handle Leaf Release
       if (releaseTriggerRef.current) {
         releaseTriggerRef.current = false;
-        // Turn settled leaves into bursting particles upward
         settledLeaves.forEach((sl) => {
           for (let p = 0; p < 2; p++) {
             particles.push({
               x: bucket.x + sl.relX,
               y: bucket.y + sl.relY,
-              vx: (Math.random() - 0.5) * 5,
-              vy: -Math.random() * 6 - 3,
+              vx: (Math.random() - 0.5) * 6,
+              vy: -Math.random() * 7 - 3,
               color: sl.color,
               alpha: 1,
               size: sl.size * 0.8,
@@ -282,36 +341,39 @@ export default function FallingLeaves() {
           }
         });
         settledLeaves = [];
-        collectedCountRef.current = 0;
         setCollectedCount(0);
       }
 
-      // Bucket physics
-      if (basketActive) {
-        bucket.y = height - 75 + bucket.bounceY;
-        const spring = 0.12;
-        const friction = 0.78;
-        const dx = bucket.targetX - bucket.x;
-        bucket.vx += dx * spring;
-        bucket.vx *= friction;
-        bucket.x += bucket.vx;
+      // Bucket Physics: Follow target with spring & damping
+      const spring = bucket.isHeld ? 0.2 : 0.08;
+      const friction = bucket.isHeld ? 0.72 : 0.82;
 
-        // Target tilt proportional to speed, smoothed
-        const targetTilt = Math.max(-0.25, Math.min(0.25, bucket.vx * 0.015));
-        bucket.tilt += (targetTilt - bucket.tilt) * 0.15;
+      const dx = bucket.targetX - bucket.x;
+      const dy = bucket.targetY - bucket.y;
 
-        // Bounce spring back to zero
-        bucket.bounceVy += -bucket.bounceY * 0.15;
-        bucket.bounceVy *= 0.75;
-        bucket.bounceY += bucket.bounceVy;
-      }
+      bucket.vx += dx * spring;
+      bucket.vx *= friction;
+      bucket.x += bucket.vx;
 
-      // Update & Draw Particles (when leaves are caught or released)
+      bucket.vy += dy * spring;
+      bucket.vy *= friction;
+      bucket.y += bucket.vy;
+
+      // Tilt proportional to horizontal velocity
+      const targetTilt = Math.max(-0.35, Math.min(0.35, bucket.vx * 0.02));
+      bucket.tilt += (targetTilt - bucket.tilt) * 0.15;
+
+      // Bounce return
+      bucket.bounceVy += -bucket.bounceY * 0.15;
+      bucket.bounceVy *= 0.75;
+      bucket.bounceY += bucket.bounceVy;
+
+      // Particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.1; // gravity
+        p.vy += 0.12;
         p.alpha -= 0.02;
 
         if (p.alpha <= 0) {
@@ -327,8 +389,8 @@ export default function FallingLeaves() {
         }
       }
 
-      // Update & Draw Falling Leaves
-      const bucketTopY = bucket.y - 10;
+      // Falling Leaves & Collision
+      const bucketTopY = bucket.y - 12;
       const bucketLeft = bucket.x - bucket.width / 2;
       const bucketRight = bucket.x + bucket.width / 2;
 
@@ -340,19 +402,17 @@ export default function FallingLeaves() {
         leaf.angle += leaf.angleSpeed;
         leaf.flipAngle += leaf.flipSpeed;
 
-        // Check Collision with Basket Rim
+        // Collision with Bucket Rim
         if (
-          basketActive &&
           leaf.y >= bucketTopY &&
-          leaf.y <= bucketTopY + 22 &&
+          leaf.y <= bucketTopY + 28 &&
           leaf.x >= bucketLeft &&
           leaf.x <= bucketRight
         ) {
-          // Leaf Caught!
-          bucket.bounceVy += 3.5; // Bucket gives a satisfying bounce!
+          bucket.bounceVy += 4;
 
           // Sparkle burst
-          for (let s = 0; s < 5; s++) {
+          for (let s = 0; s < 4; s++) {
             particles.push({
               x: leaf.x,
               y: leaf.y,
@@ -364,48 +424,31 @@ export default function FallingLeaves() {
             });
           }
 
-          // Add to settled leaves (clamped to bucket internal volume)
-          const pileLevel = Math.min(bucket.height * 0.75, settledLeaves.length * 1.8);
-          const relX = (leaf.x - bucket.x) * 0.7;
-          const relY = bucket.height * 0.8 - pileLevel;
+          // Leaves can continuously overfill the bucket!
+          // They stack up and layer over the top rim
+          const pileHeight = Math.min(60, settledLeaves.length * 1.2);
+          const spreadFactor = 0.8 + Math.min(0.4, settledLeaves.length * 0.01);
+          const relX = (leaf.x - bucket.x) * spreadFactor;
+          const relY = bucket.height * 0.7 - pileHeight;
 
           settledLeaves.push({
             relX,
             relY,
-            size: leaf.size * 0.8,
-            angle: leaf.angle,
+            size: leaf.size * 0.85,
+            angle: leaf.angle + (Math.random() - 0.5) * 0.4,
             color: leaf.color,
             opacity: 0.95,
             flipAngle: leaf.flipAngle,
           });
 
-          // Keep maximum 40 leaves settled to avoid clutter
-          if (settledLeaves.length > 40) {
-            settledLeaves.shift();
-          }
+          setCollectedCount((prev) => prev + 1);
 
-          collectedCountRef.current += 1;
-          const newTotal = collectedCountRef.current;
-          setCollectedCount(newTotal);
-
-          // Milestone celebrations
-          if (newTotal === 10) {
-            setMilestoneText("秋のそよ風 — Autumn Whisper! (10 Leaves)");
-            setTimeout(() => setMilestoneText(null), 3500);
-          } else if (newTotal === 25) {
-            setMilestoneText("紅葉狩り — Maple Harvest! (25 Leaves)");
-            setTimeout(() => setMilestoneText(null), 4000);
-          } else if (newTotal === 50) {
-            setMilestoneText("風情の達人 — Autumn Master! (50 Leaves)");
-            setTimeout(() => setMilestoneText(null), 4500);
-          }
-
-          // Spawn new leaf at top
+          // Respawn at top
           fallingLeaves[i] = createLeaf(false);
           continue;
         }
 
-        // Reset if past screen bottom or edges
+        // Reset if off bottom or sides
         if (leaf.y > height + 40 || leaf.x < -40 || leaf.x > width + 40) {
           fallingLeaves[i] = createLeaf(false);
           fallingLeaves[i].x = Math.random() * (width + 60) - 30;
@@ -418,10 +461,8 @@ export default function FallingLeaves() {
         ctx.restore();
       }
 
-      // Draw Bucket if active
-      if (basketActive) {
-        drawBucket(ctx, bucket.x, bucket.y, bucket.width, bucket.height, bucket.tilt);
-      }
+      // Draw Bucket
+      drawBucket(ctx, bucket.x, bucket.y, bucket.width, bucket.height, bucket.tilt);
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -431,10 +472,14 @@ export default function FallingLeaves() {
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousedown", handlePointerDown);
       window.removeEventListener("mousemove", handlePointerMove);
+      window.removeEventListener("mouseup", handlePointerUp);
+      window.removeEventListener("touchstart", handlePointerDown);
       window.removeEventListener("touchmove", handlePointerMove);
+      window.removeEventListener("touchend", handlePointerUp);
     };
-  }, [basketActive]);
+  }, []);
 
   const handleEmptyBasket = () => {
     releaseTriggerRef.current = true;
@@ -442,56 +487,32 @@ export default function FallingLeaves() {
 
   return (
     <>
-      {/* Interactive Physics Leaf & Bucket Canvas */}
       <canvas
         ref={canvasRef}
-        className="fixed inset-0 pointer-events-none z-30 w-full h-full"
+        className={`fixed inset-0 z-30 w-full h-full ${
+          isDragging ? "cursor-grabbing" : "cursor-default"
+        }`}
+        style={{ pointerEvents: isDragging ? "auto" : "none" }}
         aria-hidden="true"
       />
 
-      {/* Floating Autumn Basket Game HUD */}
-      <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2 select-none">
-        {/* Milestone Achievement Popup */}
-        {milestoneText && (
-          <div className="px-4 py-2 rounded-full bg-gradient-to-r from-[#C96F3B] to-[#9E472D] text-[#F5EFE5] text-xs font-mono border border-[#F0A352]/50 shadow-2xl animate-bounce flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-[#F0A352]" />
-            <span>{milestoneText}</span>
-          </div>
-        )}
+      {/* Floating Autumn Basket Game HUD (Quiet on Side) */}
+      <div className="fixed bottom-5 right-5 z-40 select-none pointer-events-auto">
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#201C19]/80 backdrop-blur-xl border border-[#C96F3B]/35 shadow-xl text-xs font-mono text-[#F5EFE5]">
+          <span className="text-[#F5EFE5]/70">Leaves Caught:</span>
+          <span className="font-bold text-[#F0A352] px-1.5 py-0.5 rounded bg-[#392820]">
+            {collectedCount}
+          </span>
 
-        {/* Control Pill */}
-        <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#201C19]/85 backdrop-blur-xl border border-[#C96F3B]/35 shadow-2xl text-xs font-mono text-[#F5EFE5]">
-          <button
-            onClick={() => setBasketActive(!basketActive)}
-            className="flex items-center gap-1.5 text-[#F0A352] hover:text-white transition-colors focus:outline-none"
-            title={basketActive ? "Hide leaf basket" : "Show leaf basket"}
-            aria-label="Toggle leaf basket"
-          >
-            {basketActive ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-            <span>{basketActive ? "Basket" : "Basket Off"}</span>
-          </button>
-
-          {basketActive && (
-            <>
-              <span className="text-[#F5EFE5]/30">|</span>
-              <div className="flex items-center gap-1">
-                <span className="text-[#F5EFE5]/70">Caught:</span>
-                <span className="font-bold text-[#F0A352] px-1.5 py-0.5 rounded bg-[#392820]">
-                  {collectedCount}
-                </span>
-              </div>
-
-              {collectedCount > 0 && (
-                <button
-                  onClick={handleEmptyBasket}
-                  className="p-1 rounded hover:bg-[#392820] text-[#F5EFE5]/60 hover:text-[#C96F3B] transition-colors"
-                  title="Release leaves to the wind"
-                  aria-label="Release leaves"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                </button>
-              )}
-            </>
+          {collectedCount > 0 && (
+            <button
+              onClick={handleEmptyBasket}
+              className="p-1 rounded hover:bg-[#392820] text-[#F5EFE5]/60 hover:text-[#C96F3B] transition-colors focus:outline-none"
+              title="Release leaves to the wind"
+              aria-label="Release leaves"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
           )}
         </div>
       </div>

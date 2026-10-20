@@ -41,11 +41,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
             <span>{project.category}</span>
           </span>
 
-          {project.japaneseTitle && (
-            <span className="px-2.5 py-0.5 rounded text-xs font-serif text-[#F5EFE5]/75 bg-[#392820]/70 backdrop-blur-md border border-[#F5EFE5]/10">
-              {project.japaneseTitle}
-            </span>
-          )}
+
         </div>
 
         {/* Subtle Golden Sheen Hover Effect */}

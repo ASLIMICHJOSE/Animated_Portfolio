@@ -3,11 +3,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import SectionHeading from "@/components/ui/SectionHeading";
-import SceneFlowPrompt from "@/components/ui/SceneFlowPrompt";
 import ProjectCard from "@/components/ui/ProjectCard";
 import { portfolioData, Project } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
-
 
 export default function ProjectsSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -83,7 +81,7 @@ export default function ProjectsSection() {
       >
         <Image
           src="/images/projects-autumn-waterfront.jpg"
-          alt="Cinematic anime sunset riverfront with bridges and sparkling autumn reflections"
+          alt="Cinematic sunset riverfront with bridges and sparkling autumn reflections"
           fill
           sizes="100vw"
           className="object-cover object-center brightness-[0.72] contrast-[1.05]"
@@ -99,13 +97,11 @@ export default function ProjectsSection() {
       <div className="relative z-10 max-w-7xl mx-auto w-full">
         <SectionHeading
           number="ACT 03 / PORTFOLIO"
-          kanjiSubtitle="制作実績と実験"
+          categoryLabel="Featured Works"
           title="Curated Works & Prototypes"
           highlightWord="Works"
           description="A selection of interactive sample projects demonstrating fluid motion choreography, modular Next.js architecture, and cinematic autumn aesthetics."
         />
-
-
 
         {/* Category Filter Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12">
@@ -133,14 +129,6 @@ export default function ProjectsSection() {
             <ProjectCard key={project.id} project={project} index={index} />
           ))}
         </div>
-
-        {/* First-Person POV Flow Trigger to Chapter 04 */}
-        <SceneFlowPrompt
-          targetId="journey"
-          chapterNumber="CHAPTER 04"
-          destinationName="The Autumn Railway"
-          japaneseDestination="鉄道へ"
-        />
       </div>
     </section>
   );

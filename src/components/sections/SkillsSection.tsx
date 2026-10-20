@@ -10,7 +10,6 @@ import {
   GitBranch,
 } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
-import SceneFlowPrompt from "@/components/ui/SceneFlowPrompt";
 import { portfolioData, SkillCategory } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
 
@@ -95,7 +94,7 @@ export default function SkillsSection() {
       >
         <Image
           src="/images/skills-autumn-pavilion.jpg"
-          alt="Modern anime architectural observatory terrace overlooking fiery autumn foliage"
+          alt="Modern architectural observatory terrace overlooking fiery autumn foliage"
           fill
           sizes="100vw"
           className="object-cover object-center brightness-[0.72] contrast-[1.05]"
@@ -111,7 +110,7 @@ export default function SkillsSection() {
       <div className="relative z-10 max-w-7xl mx-auto w-full">
         <SectionHeading
           number="ACT 02 / TOOLKIT"
-          kanjiSubtitle="技術と知識体系"
+          categoryLabel="Core Capabilities"
           title="Instruments of Creation"
           highlightWord="Creation"
           description="A balanced stack centered on expressive user interfaces, strict typing, and maintainable architectures. Designed without false percentage meters."
@@ -135,8 +134,8 @@ export default function SkillsSection() {
                   <div className="p-3 rounded-xl bg-[#392820]/90 border border-[#C96F3B]/40 group-hover:border-[#F0A352] group-hover:scale-105 transition-all duration-300">
                     {getCategoryIcon(index)}
                   </div>
-                  <span className="text-xs font-serif text-[#F0A352] tracking-wider">
-                    {category.japaneseSubtitle}
+                  <span className="text-xs font-mono text-[#F0A352] tracking-wider uppercase">
+                    {category.subtitle}
                   </span>
                 </div>
 
@@ -177,14 +176,6 @@ export default function SkillsSection() {
             </div>
           ))}
         </div>
-
-        {/* First-Person POV Flow Trigger to Chapter 03 */}
-        <SceneFlowPrompt
-          targetId="projects"
-          chapterNumber="CHAPTER 03"
-          destinationName="The Sunset Waterfront"
-          japaneseDestination="水辺へ"
-        />
       </div>
     </section>
   );

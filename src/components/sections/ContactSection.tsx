@@ -93,7 +93,7 @@ export default function ContactSection() {
       >
         <Image
           src="/images/contact-autumn-twilight.jpg"
-          alt="Cinematic anime twilight riverside with warm lanterns and autumn leaves"
+          alt="Cinematic twilight riverside with warm lanterns and autumn leaves"
           fill
           sizes="100vw"
           className="object-cover object-center brightness-[0.76] contrast-[1.05]"
@@ -108,7 +108,7 @@ export default function ContactSection() {
       <div className="relative z-10 max-w-4xl mx-auto w-full my-auto">
         <SectionHeading
           number="ACT 05 / DESTINATION"
-          kanjiSubtitle="連絡と対話"
+          categoryLabel="Connect"
           title="Weave Something Memorable"
           highlightWord="Memorable"
           description="Whether you have an ambitious digital vision, an intriguing project, or simply want to converse about cinematic web design, my inbox is always open."
@@ -213,8 +213,8 @@ export default function ContactSection() {
         </div>
 
         <div className="flex items-center gap-6">
-          <span className="hidden md:inline font-serif text-[#F0A352]">
-            「秋風に紡ぐコード」
+          <span className="hidden md:inline font-mono text-[#F0A352]/80 uppercase tracking-widest text-[11px]">
+            Next.js • Three.js • TypeScript • GSAP
           </span>
           <button
             onClick={scrollToTop}

@@ -2,9 +2,8 @@
 
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
-import { ArrowDown, Sparkles, FolderGit2, Mail } from "lucide-react";
+import { Sparkles, FolderGit2, Mail, ArrowDown } from "lucide-react";
 import Button from "@/components/ui/Button";
-import SceneFlowPrompt from "@/components/ui/SceneFlowPrompt";
 import { portfolioData } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
 
@@ -18,9 +17,8 @@ export default function HeroSection() {
   const ctaRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const { gsap, ScrollTrigger } = initGSAP();
+    const { gsap } = initGSAP();
 
-    // Check prefers-reduced-motion
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
@@ -31,7 +29,7 @@ export default function HeroSection() {
 
       tl.fromTo(
         bgImageRef.current,
-        { scale: 1.12, opacity: 0.6 },
+        { scale: 1.15, opacity: 0.6 },
         { scale: 1.0, opacity: 1, duration: 2.2 }
       )
         .fromTo(
@@ -62,8 +60,8 @@ export default function HeroSection() {
       // Scroll-triggered Layered Parallax
       if (containerRef.current) {
         gsap.to(bgImageRef.current, {
-          yPercent: 20,
-          scale: 1.06,
+          yPercent: 22,
+          scale: 1.1,
           ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
@@ -74,8 +72,8 @@ export default function HeroSection() {
         });
 
         gsap.to(foliageRef.current, {
-          yPercent: -15,
-          scale: 1.04,
+          yPercent: -18,
+          scale: 1.06,
           ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
@@ -87,7 +85,7 @@ export default function HeroSection() {
 
         gsap.to(contentRef.current, {
           yPercent: 35,
-          opacity: 0.2,
+          opacity: 0.15,
           ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
@@ -111,7 +109,7 @@ export default function HeroSection() {
       {/* Layer 0: Anime Autumn City Backdrop */}
       <div
         ref={bgImageRef}
-        className="absolute inset-0 w-full h-full pointer-events-none will-change-transform"
+        className="absolute inset-0 w-full h-[120%] -top-[10%] pointer-events-none will-change-transform"
       >
         <Image
           src="/images/hero-autumn-city.jpg"
@@ -147,7 +145,7 @@ export default function HeroSection() {
         ref={contentRef}
         className="relative z-20 max-w-5xl mx-auto px-6 sm:px-8 text-center pt-24 pb-16 will-change-transform flex flex-col items-center justify-center"
       >
-        {/* Japanese Script & Badge */}
+        {/* Badge */}
         <div ref={subtitleRef} className="mb-6 flex flex-col items-center gap-2">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#201C19]/80 border border-[#C96F3B]/40 backdrop-blur-md shadow-lg shadow-black/30">
             <Sparkles className="w-3.5 h-3.5 text-[#F0A352] animate-pulse" />
@@ -155,11 +153,10 @@ export default function HeroSection() {
               Creative Engineering & UI/UX
             </span>
             <span className="text-[#F5EFE5]/40 text-xs">•</span>
-            <span className="text-xs font-serif text-[#F5EFE5]/85">秋風の旅</span>
+            <span className="text-xs font-mono text-[#F5EFE5]/85 uppercase tracking-wider">
+              Autumn Journey
+            </span>
           </div>
-          <span className="text-xs sm:text-sm font-serif tracking-[0.35em] text-[#F5EFE5]/70 uppercase">
-            アスリ・ミチ・ホセ
-          </span>
         </div>
 
         {/* Main Monolithic Identity */}
@@ -205,24 +202,22 @@ export default function HeroSection() {
           </Button>
         </div>
 
-        {/* Film grain touch */}
-        <div className="mt-10 inline-flex items-center gap-6 text-xs font-mono text-[#F5EFE5]/50">
+        {/* Subtle Tech Stack Footer */}
+        <div className="mt-12 inline-flex items-center gap-6 text-xs font-mono text-[#F5EFE5]/50">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
             <span className="text-emerald-400 font-medium">Available for Opportunities</span>
           </span>
           <span className="hidden sm:inline text-[#F5EFE5]/30">|</span>
-          <span className="hidden sm:inline">TypeScript • React • Next.js • GSAP</span>
+          <span className="hidden sm:inline">TypeScript • React • Next.js • Three.js • GSAP</span>
         </div>
 
-        {/* First-Person POV Flow Trigger to Chapter 01 */}
-        <div className="mt-4">
-          <SceneFlowPrompt
-            targetId="about"
-            chapterNumber="CHAPTER 01"
-            destinationName="The Autumn Garden"
-            japaneseDestination="庭園へ"
-          />
+        {/* Scroll Indicator */}
+        <div className="mt-10 flex flex-col items-center gap-2 pointer-events-none opacity-70">
+          <span className="text-[10px] font-mono tracking-widest text-[#F0A352] uppercase">
+            Scroll to Journey
+          </span>
+          <ArrowDown className="w-4 h-4 text-[#F0A352] animate-bounce" />
         </div>
       </div>
     </section>

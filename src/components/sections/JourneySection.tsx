@@ -3,7 +3,6 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import SectionHeading from "@/components/ui/SectionHeading";
-import SceneFlowPrompt from "@/components/ui/SceneFlowPrompt";
 import { portfolioData, JourneyMilestone } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
 
@@ -73,7 +72,7 @@ export default function JourneySection() {
       >
         <Image
           src="/images/journey-autumn-train.jpg"
-          alt="Anime autumn railway tracks stretching into misty hills"
+          alt="Autumn railway tracks stretching into misty hills"
           fill
           sizes="100vw"
           className="object-cover object-center brightness-[0.74] contrast-[1.05]"
@@ -88,7 +87,7 @@ export default function JourneySection() {
       <div className="relative z-10 max-w-5xl mx-auto w-full">
         <SectionHeading
           number="ACT 04 / CHRONICLE"
-          kanjiSubtitle="成長の軌跡"
+          categoryLabel="Milestone Timeline"
           title="The Developer Odyssey"
           highlightWord="Odyssey"
           description="A visual narrative mapping the progression from foundational curiosity to modern fullstack architecture and cinematic motion."
@@ -161,14 +160,6 @@ export default function JourneySection() {
             })}
           </div>
         </div>
-
-        {/* First-Person POV Flow Trigger to Chapter 05 */}
-        <SceneFlowPrompt
-          targetId="contact"
-          chapterNumber="CHAPTER 05"
-          destinationName="Twilight Lanterns"
-          japaneseDestination="灯篭へ"
-        />
       </div>
     </section>
   );

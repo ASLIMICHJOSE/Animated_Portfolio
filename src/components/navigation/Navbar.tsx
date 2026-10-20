@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Sparkles, Send } from "lucide-react";
-import { portfolioData } from "@/data/portfolio";
+import { Menu, X, Send } from "lucide-react";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -14,7 +13,6 @@ export default function Navbar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
 
-      // Simple active section detection
       const sections = ["hero", "about", "skills", "projects", "journey", "contact"];
       const scrollPosition = window.scrollY + 250;
 
@@ -36,12 +34,12 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "Intro", href: "#hero", id: "hero", kanji: "序幕" },
-    { name: "About", href: "#about", id: "about", kanji: "概要" },
-    { name: "Skills", href: "#skills", id: "skills", kanji: "技術" },
-    { name: "Projects", href: "#projects", id: "projects", kanji: "作品" },
-    { name: "Journey", href: "#journey", id: "journey", kanji: "軌跡" },
-    { name: "Contact", href: "#contact", id: "contact", kanji: "連絡" },
+    { name: "Intro", href: "#hero", id: "hero", label: "01" },
+    { name: "About", href: "#about", id: "about", label: "02" },
+    { name: "Skills", href: "#skills", id: "skills", label: "03" },
+    { name: "Projects", href: "#projects", id: "projects", label: "04" },
+    { name: "Journey", href: "#journey", id: "journey", label: "05" },
+    { name: "Contact", href: "#contact", id: "contact", label: "06" },
   ];
 
   return (
@@ -60,8 +58,8 @@ export default function Navbar() {
             <span className="font-serif font-bold text-sm text-[#F5EFE5] tracking-wide group-hover:text-[#F0A352] transition-colors">
               ASLI MICH JOSE
             </span>
-            <span className="text-[10px] font-mono text-[#F0A352]/80 tracking-widest">
-              アスリ・ミチ・ホセ
+            <span className="text-[10px] font-mono text-[#F0A352]/80 tracking-widest uppercase">
+              Creative Developer
             </span>
           </div>
         </Link>
@@ -88,9 +86,6 @@ export default function Navbar() {
                 }`}
               >
                 <span>{link.name}</span>
-                <span className="text-[9px] text-[#F0A352]/60 ml-1 font-serif opacity-75 group-hover:opacity-100">
-                  {link.kanji}
-                </span>
                 {isActive && (
                   <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#F0A352]" />
                 )}
@@ -157,7 +152,7 @@ export default function Navbar() {
                   <span className="text-xs font-mono text-[#F0A352]">0{index + 1}</span>
                   <span>{link.name}</span>
                 </div>
-                <span className="text-sm font-serif text-[#F0A352]/70">{link.kanji}</span>
+                <span className="text-xs font-mono text-[#F0A352]/70 uppercase">Chapter 0{index + 1}</span>
               </a>
             ))}
           </nav>
@@ -171,7 +166,7 @@ export default function Navbar() {
               Get In Touch
             </a>
             <p className="text-xs text-center text-[#F5EFE5]/50 font-mono">
-              Designed with autumn cinematic aesthetics
+              Cinematic Developer Experience
             </p>
           </div>
         </div>

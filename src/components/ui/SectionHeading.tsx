@@ -4,7 +4,7 @@ import React from "react";
 
 interface SectionHeadingProps {
   number: string;
-  kanjiSubtitle: string;
+  categoryLabel?: string;
   title: string;
   highlightWord?: string;
   description?: string;
@@ -14,7 +14,7 @@ interface SectionHeadingProps {
 
 export default function SectionHeading({
   number,
-  kanjiSubtitle,
+  categoryLabel,
   title,
   highlightWord,
   description,
@@ -23,7 +23,6 @@ export default function SectionHeading({
 }: SectionHeadingProps) {
   const isCenter = alignment === "center";
 
-  // Split title if highlightWord is specified
   const renderTitle = () => {
     if (!highlightWord) return title;
     const parts = title.split(highlightWord);
@@ -44,7 +43,7 @@ export default function SectionHeading({
         isCenter ? "text-center mx-auto max-w-3xl" : "text-left max-w-2xl"
       } ${className}`}
     >
-      {/* Chapter Badge with Japanese Script */}
+      {/* Chapter Badge */}
       <div
         className={`inline-flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-[#392820]/60 border border-[#C96F3B]/30 backdrop-blur-sm text-xs font-mono tracking-widest text-[#F0A352] mb-5 ${
           isCenter ? "justify-center" : ""
@@ -52,8 +51,14 @@ export default function SectionHeading({
       >
         <span className="w-1.5 h-1.5 rounded-full bg-[#C96F3B] animate-pulse" />
         <span>{number}</span>
-        <span className="text-[#F5EFE5]/30">|</span>
-        <span className="font-serif tracking-normal text-[#F5EFE5]/90">{kanjiSubtitle}</span>
+        {categoryLabel && (
+          <>
+            <span className="text-[#F5EFE5]/30">|</span>
+            <span className="tracking-wider text-[#F5EFE5]/90 font-mono text-[11px] uppercase">
+              {categoryLabel}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Main Title */}
