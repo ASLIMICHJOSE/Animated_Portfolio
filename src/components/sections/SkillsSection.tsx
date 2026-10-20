@@ -10,6 +10,7 @@ import {
   GitBranch,
 } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
+import SceneFlowPrompt from "@/components/ui/SceneFlowPrompt";
 import { portfolioData, SkillCategory } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
 
@@ -169,13 +170,21 @@ export default function SkillsSection() {
               </div>
 
               {/* Bottom Card Footer */}
-              <div className="pt-4 border-t border-[#C96F3B]/20 flex items-center justify-between text-[11px] font-mono text-[#F5EFE5]/50">
-                <span>0{index + 1} // FOCUS</span>
-                <span className="text-[#F0A352]/75">Verified Tool</span>
+              <div className="pt-4 border-t border-[#C96F3B]/20 flex items-center justify-between text-xs font-mono text-[#F5EFE5]/50">
+                <span>Domain 0{index + 1}</span>
+                <span className="text-[#F0A352]/75">{category.skills.length} Technologies</span>
               </div>
             </div>
           ))}
         </div>
+
+        {/* First-Person POV Flow Trigger to Chapter 03 */}
+        <SceneFlowPrompt
+          targetId="projects"
+          chapterNumber="CHAPTER 03"
+          destinationName="The Sunset Waterfront"
+          japaneseDestination="水辺へ"
+        />
       </div>
     </section>
   );

@@ -68,7 +68,7 @@ export default function SectionHeading({
         }`}
       >
         <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#C96F3B]" />
-        <span className="text-[#F0A352] text-xs">◈</span>
+        <span className="w-1.5 h-1.5 rounded-full bg-[#F0A352]" />
         <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#C96F3B]" />
       </div>
 

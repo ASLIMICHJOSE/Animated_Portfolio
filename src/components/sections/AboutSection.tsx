@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { Sparkles, BookOpen, Heart } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
+import SceneFlowPrompt from "@/components/ui/SceneFlowPrompt";
 import { portfolioData } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
 
@@ -175,7 +176,7 @@ export default function AboutSection() {
                     key={index}
                     className="flex items-start gap-2.5 text-sm text-[#F5EFE5]/90 font-sans"
                   >
-                    <span className="text-[#C96F3B] mt-1 text-xs">◈</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C96F3B] mt-2 shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -201,6 +202,14 @@ export default function AboutSection() {
             </div>
           </div>
         </div>
+
+        {/* First-Person POV Flow Trigger to Chapter 02 */}
+        <SceneFlowPrompt
+          targetId="skills"
+          chapterNumber="CHAPTER 02"
+          destinationName="The Hillside Observatory"
+          japaneseDestination="展望台へ"
+        />
       </div>
     </section>
   );

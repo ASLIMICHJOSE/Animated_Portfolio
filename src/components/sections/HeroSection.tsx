@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { ArrowDown, Sparkles, FolderGit2, Mail } from "lucide-react";
 import Button from "@/components/ui/Button";
+import SceneFlowPrompt from "@/components/ui/SceneFlowPrompt";
 import { portfolioData } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
 
@@ -205,7 +206,7 @@ export default function HeroSection() {
         </div>
 
         {/* Film grain touch */}
-        <div className="mt-14 inline-flex items-center gap-6 text-xs font-mono text-[#F5EFE5]/50">
+        <div className="mt-10 inline-flex items-center gap-6 text-xs font-mono text-[#F5EFE5]/50">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
             <span className="text-emerald-400 font-medium">Available for Opportunities</span>
@@ -213,15 +214,15 @@ export default function HeroSection() {
           <span className="hidden sm:inline text-[#F5EFE5]/30">|</span>
           <span className="hidden sm:inline">TypeScript • React • Next.js • GSAP</span>
         </div>
-      </div>
 
-      {/* Layer 4: Scroll Down Indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none">
-        <span className="text-[11px] font-mono tracking-widest text-[#F0A352]/80 uppercase">
-          Scroll to explore
-        </span>
-        <div className="w-5 h-8 rounded-full border border-[#C96F3B]/50 flex items-start justify-center p-1 bg-[#201C19]/50 backdrop-blur-sm">
-          <div className="w-1.5 h-2 rounded-full bg-[#F0A352] animate-bounce" />
+        {/* First-Person POV Flow Trigger to Chapter 01 */}
+        <div className="mt-4">
+          <SceneFlowPrompt
+            targetId="about"
+            chapterNumber="CHAPTER 01"
+            destinationName="The Autumn Garden"
+            japaneseDestination="庭園へ"
+          />
         </div>
       </div>
     </section>

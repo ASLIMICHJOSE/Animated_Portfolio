@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import SectionHeading from "@/components/ui/SectionHeading";
+import SceneFlowPrompt from "@/components/ui/SceneFlowPrompt";
 import { portfolioData, JourneyMilestone } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
 
@@ -160,6 +161,14 @@ export default function JourneySection() {
             })}
           </div>
         </div>
+
+        {/* First-Person POV Flow Trigger to Chapter 05 */}
+        <SceneFlowPrompt
+          targetId="contact"
+          chapterNumber="CHAPTER 05"
+          destinationName="Twilight Lanterns"
+          japaneseDestination="灯篭へ"
+        />
       </div>
     </section>
   );
