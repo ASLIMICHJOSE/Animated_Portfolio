@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   ArrowUpRight,
+  ArrowRight,
   Layers,
   Code,
   Terminal,
@@ -196,172 +197,43 @@ export default function SkillsSection() {
               ref={trackRef}
               className="flex flex-nowrap items-center gap-6 sm:gap-10 px-4 sm:px-8 w-max will-change-transform"
             >
-              {/* 1. FIRST SKILL CARD (Frontend Development) */}
-              <div className="flex flex-col w-[85vw] sm:w-[460px] md:w-[490px] lg:w-[520px] shrink-0 select-none group first:ml-[4vw] sm:first:ml-[6vw]">
-                <div className="relative h-[56vh] sm:h-[62vh] min-h-[440px] max-h-[580px] rounded-3xl overflow-hidden glass-panel border border-[#C96F3B]/35 group-hover:border-[#F0A352] transition-all duration-500 shadow-2xl shadow-black/70 bg-[#1A1614]/90 flex flex-col">
-                  <div className="card-parallax-inner p-6 sm:p-9 flex flex-col justify-between h-full relative z-10">
-                    {/* Top Row: Icon, Index & Domain Tag */}
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3.5">
-                          <div className="p-3 rounded-2xl bg-[#2D1E16] border border-[#C96F3B]/40 text-[#F0A352] shadow-md group-hover:scale-105 transition-transform duration-300">
-                            {getCategoryIcon(0)}
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-[11px] font-mono text-[#F0A352] tracking-wider uppercase font-semibold">
-                              {categories[0].subtitle}
-                            </span>
-                            <span className="text-xs font-mono text-[#F5EFE5]/50">
-                              PRIMARY DOMAIN // 01
-                            </span>
-                          </div>
-                        </div>
-
-                        <span className="px-3 py-1 rounded-full text-[10px] font-mono tracking-wider bg-[#201C19]/80 border border-[#C96F3B]/30 text-[#F0A352] font-semibold">
-                          ● ACTIVE PRODUCTION
-                        </span>
-                      </div>
-
-                      <div className="w-full h-px bg-gradient-to-r from-[#C96F3B]/30 via-[#F0A352]/20 to-transparent mb-5" />
-                    </div>
-
-                    {/* Middle: Full-Featured Skill Modules */}
-                    <div className="space-y-3 my-auto overflow-y-auto pr-1 custom-scrollbar max-h-[300px]">
-                      {categories[0].skills.map((skill) => (
-                        <div
-                          key={skill.name}
-                          className="group/pill p-3.5 rounded-2xl bg-[#201C19]/85 border border-[#C96F3B]/20 hover:border-[#F0A352] hover:bg-[#2D1E16] transition-all duration-200"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-5 h-5 rounded-lg bg-[#392820]/90 border border-[#C96F3B]/30 flex items-center justify-center text-[#F0A352]">
-                                <Check className="w-3 h-3 text-[#F0A352]" />
-                              </div>
-                              <span className="text-sm font-mono text-[#F5EFE5] font-semibold group-hover/pill:text-[#FFE8B8]">
-                                {skill.name}
-                              </span>
-                            </div>
-
-                            <span className="text-[9px] font-mono uppercase px-2 py-0.5 rounded-md bg-[#2D1E16] text-[#F0A352]/80 border border-[#C96F3B]/20">
-                              Engineered
-                            </span>
-                          </div>
-
-                          {skill.description && (
-                            <p className="text-xs text-[#F5EFE5]/70 mt-1.5 font-sans font-light leading-relaxed pl-7">
-                              {skill.description}
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Bottom Metric */}
-                    <div className="pt-4 border-t border-[#C96F3B]/25 flex items-center justify-between text-xs font-mono text-[#F5EFE5]/60 mt-auto">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-[#F0A352] animate-pulse" />
-                        <span className="text-[#F0A352] font-medium">Standard Compliance</span>
-                      </div>
-                      <span className="text-[#FFE8B8] font-bold">
-                        {categories[0].skills.length} Core Modules
-                      </span>
-                    </div>
+              {/* 1. BIG 'SKILLS' TITLE (Matches ASLI MICH JOSE size, with arrow after text) */}
+              <div className="flex flex-col justify-center h-[56vh] sm:h-[62vh] min-h-[440px] max-h-[580px] shrink-0 select-none pr-4 sm:pr-8 md:pr-12 first:ml-[4vw] sm:first:ml-[6vw] lg:first:ml-[7vw]">
+                <div className="card-parallax-inner flex flex-col justify-center">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#201C19]/80 border border-[#F0A352]/40 text-[11px] font-mono text-[#F0A352] mb-4 w-fit shadow-sm backdrop-blur-sm">
+                    <Sparkles className="w-3.5 h-3.5 text-[#F0A352]" />
+                    <span className="font-bold tracking-widest uppercase">SECTION 02 // CAPABILITIES</span>
                   </div>
 
-                  <div className="absolute bottom-5 right-5 z-20 w-11 h-11 rounded-full bg-[#F0A352] text-[#201C19] flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 shadow-xl shadow-[#F0A352]/40 pointer-events-none">
-                    <ArrowUpRight className="w-5 h-5 text-[#201C19]" />
-                  </div>
-                </div>
+                  {/* Title size matching ASLI MICH JOSE: text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-extrabold */}
+                  <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-extrabold text-[#F5EFE5] tracking-tight leading-[1.05] drop-shadow-2xl flex items-center gap-3 sm:gap-5 md:gap-6 whitespace-nowrap">
+                    <span>SKILLS</span>
+                    <ArrowRight className="w-8 h-8 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 text-[#F0A352] shrink-0 stroke-[2.5] animate-pulse" />
+                  </h2>
 
-                <div className="py-4 flex flex-col items-start">
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#F5EFE5] group-hover:text-[#F0A352] transition-colors duration-300">
-                    {categories[0].title}
-                  </h3>
-                  <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-[#F5EFE5]/50 mt-1.5">
-                    <span>{categories[0].subtitle}</span>
-                    <span>•</span>
-                    <span className="text-[#F0A352]/85 font-medium">
-                      {categories[0].skills.map((s) => s.name).join(" · ")}
+                  <p className="text-xl sm:text-2xl md:text-3xl font-serif italic text-[#FFE8B8] mt-3 font-normal">
+                    Instruments of Creation
+                  </p>
+
+                  <p className="text-xs sm:text-sm font-sans text-[#F5EFE5]/75 font-light max-w-[320px] sm:max-w-sm md:max-w-md mt-4 leading-relaxed">
+                    A curated technical stack centered on expressive user interfaces, strict typing, and maintainable architectures.
+                  </p>
+
+                  <div className="flex items-center gap-3 mt-6 text-xs font-mono text-[#F0A352]">
+                    <span className="w-8 h-px bg-[#F0A352]/50" />
+                    <span className="tracking-widest uppercase text-[11px] font-bold text-[#FFE8B8]">5 Core Domains</span>
+                    <span className="text-[#F5EFE5]/40">•</span>
+                    <span className="tracking-wider text-[11px] text-[#F0A352]/90 flex items-center gap-1.5">
+                      <span>Explore domain cards</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#F0A352]" />
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* 2. IDENTIFYING SKILL TEXT CARD (Placed directly in the right of the first skill card!) */}
-              <div className="flex flex-col w-[85vw] sm:w-[460px] md:w-[490px] lg:w-[520px] shrink-0 select-none group">
-                <div className="relative h-[56vh] sm:h-[62vh] min-h-[440px] max-h-[580px] rounded-3xl overflow-hidden glass-panel-warm border border-[#F0A352]/50 p-6 sm:p-8 flex flex-col justify-between shadow-2xl shadow-black/70 bg-gradient-to-br from-[#2D1E16] via-[#201C19] to-[#151210]">
-                  {/* Background ambient radial glow */}
-                  <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#F0A352]/15 rounded-full blur-3xl pointer-events-none" />
-
-                  <div>
-                    {/* Identification Badge */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#201C19]/90 border border-[#F0A352]/50 text-[10px] font-mono text-[#F0A352] mb-3.5 shadow-sm">
-                      <Sparkles className="w-3.5 h-3.5 text-[#F0A352]" />
-                      <span className="font-semibold tracking-wider">SKILL IDENTIFYING & ARCHITECTURE</span>
-                    </div>
-
-                    {/* Identifying Title */}
-                    <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#F5EFE5] mb-2 leading-tight">
-                      Instruments of{" "}
-                      <span className="text-[#F0A352] italic font-normal text-glow">
-                        Creation
-                      </span>
-                    </h3>
-
-                    {/* Identifying Skill Text */}
-                    <p className="text-xs sm:text-sm font-sans text-[#F5EFE5]/85 font-light leading-relaxed mb-4">
-                      A balanced stack centered on expressive user interfaces, strict typing, and maintainable architectures. Built for zero jank, responsive fluid motion, and longevity. Designed without false percentage meters.
-                    </p>
-
-                    {/* Identifying Domain Breakdown List */}
-                    <div className="space-y-1.5 font-mono text-xs mb-3">
-                      <div className="text-[10px] uppercase tracking-wider text-[#F0A352]/80 font-bold mb-1">
-                        Domain Capability Matrix:
-                      </div>
-                      {[
-                        { num: "01", name: "Frontend Development", desc: "React, Next.js, GSAP, Tailwind" },
-                        { num: "02", name: "Programming Languages", desc: "TypeScript & Modern ES6+" },
-                        { num: "03", name: "Backend Development", desc: "Node.js & RESTful APIs" },
-                        { num: "04", name: "Databases & Storage", desc: "SQL & Client State Persistence" },
-                        { num: "05", name: "Tools & Workflow", desc: "Git, GitHub & Turbopack" },
-                      ].map((d) => (
-                        <div
-                          key={d.num}
-                          className="p-2 sm:p-2.5 rounded-xl bg-[#201C19]/85 border border-[#C96F3B]/25 hover:border-[#F0A352]/40 transition-colors flex items-center justify-between"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-[#F0A352] font-bold text-xs">{d.num}</span>
-                            <span className="text-[#F5EFE5] font-semibold text-xs">{d.name}</span>
-                          </div>
-                          <span className="text-[10px] text-[#F5EFE5]/55 hidden sm:inline">{d.desc}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Certification / Verification */}
-                  <div className="pt-3 border-t border-[#C96F3B]/30 flex items-center justify-between text-xs font-mono text-[#F0A352]">
-                    <div className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#F0A352]" />
-                      <span className="font-semibold text-[#FFE8B8]">15+ Technologies</span>
-                    </div>
-                    <span className="text-[#F5EFE5]/60 text-[11px]">100% Standard Compliance</span>
-                  </div>
-                </div>
-
-                <div className="py-4 flex flex-col items-start">
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#F5EFE5] group-hover:text-[#F0A352] transition-colors">
-                    Skill Identification & Stack
-                  </h3>
-                  <span className="text-xs font-mono text-[#F5EFE5]/50 mt-1.5">
-                    5 Domain Matrices · Full Stack Architecture
-                  </span>
-                </div>
-              </div>
-
-              {/* 3. REMAINING DOMAIN SKILL CARDS (02 to 05) */}
-              {categories.slice(1).map((category: SkillCategory, idx: number) => {
-                const actualIndex = idx + 1;
+              {/* 2. DOMAIN SKILL CARDS (01 to 05, starting with Frontend Development) */}
+              {categories.map((category: SkillCategory, idx: number) => {
+                const isPrimary = idx === 0;
                 return (
                   <div
                     key={category.title}
@@ -369,18 +241,19 @@ export default function SkillsSection() {
                   >
                     <div className="relative h-[56vh] sm:h-[62vh] min-h-[440px] max-h-[580px] rounded-3xl overflow-hidden glass-panel border border-[#C96F3B]/35 group-hover:border-[#F0A352] transition-all duration-500 shadow-2xl shadow-black/70 bg-[#1A1614]/90 flex flex-col">
                       <div className="card-parallax-inner p-6 sm:p-9 flex flex-col justify-between h-full relative z-10">
+                        {/* Top Row: Icon, Index & Domain Tag */}
                         <div>
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3.5">
                               <div className="p-3 rounded-2xl bg-[#2D1E16] border border-[#C96F3B]/40 text-[#F0A352] shadow-md group-hover:scale-105 transition-transform duration-300">
-                                {getCategoryIcon(actualIndex)}
+                                {getCategoryIcon(idx)}
                               </div>
                               <div className="flex flex-col">
                                 <span className="text-[11px] font-mono text-[#F0A352] tracking-wider uppercase font-semibold">
                                   {category.subtitle}
                                 </span>
                                 <span className="text-xs font-mono text-[#F5EFE5]/50">
-                                  DOMAIN // 0{actualIndex + 1}
+                                  {isPrimary ? "PRIMARY DOMAIN // 01" : `DOMAIN // 0${idx + 1}`}
                                 </span>
                               </div>
                             </div>
@@ -393,6 +266,7 @@ export default function SkillsSection() {
                           <div className="w-full h-px bg-gradient-to-r from-[#C96F3B]/30 via-[#F0A352]/20 to-transparent mb-5" />
                         </div>
 
+                        {/* Middle: Full-Featured Skill Modules */}
                         <div className="space-y-3 my-auto overflow-y-auto pr-1 custom-scrollbar max-h-[300px]">
                           {category.skills.map((skill) => (
                             <div
@@ -423,6 +297,7 @@ export default function SkillsSection() {
                           ))}
                         </div>
 
+                        {/* Bottom Metric */}
                         <div className="pt-4 border-t border-[#C96F3B]/25 flex items-center justify-between text-xs font-mono text-[#F5EFE5]/60 mt-auto">
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-[#F0A352] animate-pulse" />
