@@ -9,6 +9,9 @@ import {
   Send,
   Sparkles,
   Phone,
+  FileText,
+  Download,
+  ExternalLink,
 } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
@@ -264,6 +267,93 @@ export default function ContactSection() {
                 {portfolioData.socials.phone}
               </Button>
             )}
+
+            <Button
+              href="/resume.pdf"
+              variant="amber"
+              size="md"
+              external
+              icon={<FileText className="w-4 h-4" />}
+              ariaLabel="View Asli Mich Jose Resume PDF"
+            >
+              Resume [PDF]
+            </Button>
+          </div>
+        </div>
+
+        {/* Dedicated Interactive Resume Showcase Card */}
+        <div className="mt-8 p-6 sm:p-7 rounded-3xl glass-panel-warm border border-[#F0A352]/45 bg-[#181310]/95 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group text-left">
+          {/* Subtle Top Amber Glow Line */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F0A352] to-transparent shadow-[0_0_15px_#F0A352]" />
+
+          <div className="flex items-center gap-5 w-full md:w-auto">
+            {/* Miniature Document Preview with Visual Depth */}
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative w-20 h-28 sm:w-24 sm:h-32 rounded-xl overflow-hidden border-2 border-[#C96F3B]/40 shadow-xl bg-white shrink-0 group-hover:border-[#F0A352] transition-colors block cursor-pointer"
+            >
+              <Image
+                src="/resume/resume-preview.png"
+                alt="Asli Mich Jose Resume Preview"
+                fill
+                sizes="120px"
+                className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-90" />
+              <div className="absolute bottom-1.5 left-1.5 right-1.5 px-1 py-0.5 rounded bg-[#0078D4]/90 text-[9px] font-mono text-center text-white font-bold tracking-wider">
+                PDF · 2026
+              </div>
+            </a>
+
+            {/* Document Info */}
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#F0A352] font-semibold flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-[#F0A352]" />
+                  Official Curriculum Vitae
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-[#34D399]/15 border border-[#34D399]/30 text-[#34D399] font-bold">
+                  Verified
+                </span>
+              </div>
+              <h4 className="text-lg sm:text-xl font-serif font-bold text-[#F5EFE5] group-hover:text-[#F0A352] transition-colors leading-snug">
+                Asli Mich Jose J — Resume
+              </h4>
+              <p className="text-xs text-[#F5EFE5]/70 font-sans font-light mt-1 max-w-md leading-relaxed">
+                Computer Science Engineer · Frontend &amp; Full-Stack AI Developer · Experience at Admini · Microsoft &amp; MongoDB Certified.
+              </p>
+              <div className="flex items-center gap-3 mt-2 text-[11px] font-mono text-[#FFE8B8]/80">
+                <span>● 2 Pages</span>
+                <span>● ATS Optimized</span>
+                <span>● Clean Typography</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full md:w-auto shrink-0 justify-center">
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#F0A352] text-[#181310] font-mono font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#FFE8B8] transition-all shadow-[0_0_25px_rgba(240,163,82,0.35)] hover:scale-105 active:scale-95"
+            >
+              <FileText className="w-4 h-4" />
+              <span>View Official Resume</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            </a>
+
+            <a
+              href="/resume.pdf"
+              download="Asli_Mich_Jose_Resume.pdf"
+              title="Download Resume PDF directly"
+              className="p-3 rounded-xl bg-[#201C19] border border-[#C96F3B]/40 text-[#F5EFE5]/80 hover:text-[#181310] hover:bg-[#F0A352] hover:border-[#F0A352] transition-all shadow-sm flex items-center justify-center"
+              aria-label="Download Resume PDF"
+            >
+              <Download className="w-4 h-4" />
+            </a>
           </div>
         </div>
       </div>

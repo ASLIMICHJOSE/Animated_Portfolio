@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Send } from "lucide-react";
+import { Menu, X, Send, FileText } from "lucide-react";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -96,7 +96,18 @@ export default function Navbar() {
         </nav>
 
         {/* CTA and Mobile Menu Toggle */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <a
+            href="/resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-mono tracking-wider uppercase text-[#FFE8B8] bg-[#181310]/80 hover:bg-[#F0A352] hover:text-[#181310] border border-[#C96F3B]/40 hover:border-[#F0A352] shadow-sm transition-all duration-300"
+            aria-label="View Asli Mich Jose Resume PDF"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Resume</span>
+          </a>
+
           <a
             href="#contact"
             className="hidden sm:inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-medium tracking-wider uppercase text-[#F5EFE5] bg-gradient-to-r from-[#C96F3B] to-[#9E472D] hover:brightness-110 border border-[#F0A352]/40 shadow-md shadow-[#C96F3B]/20 transition-all duration-300 active:scale-95"
@@ -141,7 +152,7 @@ export default function Navbar() {
             </button>
           </div>
 
-          <nav className="flex flex-col gap-5 py-8" aria-label="Mobile Navigation">
+          <nav className="flex flex-col gap-4 py-6" aria-label="Mobile Navigation">
             {navLinks.map((link, index) => (
               <a
                 key={link.id}
@@ -158,17 +169,25 @@ export default function Navbar() {
             ))}
           </nav>
 
-          <div className="pt-6 border-t border-[#C96F3B]/20 flex flex-col gap-4">
+          <div className="pt-4 border-t border-[#C96F3B]/20 flex flex-col gap-3">
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-3 text-center rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-[#F0A352] text-[#181310] flex items-center justify-center gap-2 shadow-md shadow-[#F0A352]/30"
+            >
+              <FileText className="w-4 h-4" />
+              <span>View Official Resume [PDF]</span>
+            </a>
+
             <a
               href="#contact"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-3.5 text-center rounded-full text-sm font-medium tracking-wide bg-gradient-to-r from-[#C96F3B] to-[#9E472D] text-[#F5EFE5] shadow-lg shadow-[#C96F3B]/30"
+              className="w-full py-3 text-center rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-gradient-to-r from-[#C96F3B] to-[#9E472D] text-[#F5EFE5] shadow-lg shadow-[#C96F3B]/30"
             >
               Get In Touch
             </a>
-            <p className="text-xs text-center text-[#F5EFE5]/50 font-mono">
-              Cinematic Developer Experience
-            </p>
           </div>
         </div>
       )}
