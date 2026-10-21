@@ -1,190 +1,167 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import Image from "next/image";
 import { Project } from "@/data/portfolio";
-import { ExternalLink, Sparkles } from "lucide-react";
+import { ArrowUpRight, Sparkles } from "lucide-react";
 import { GithubIcon } from "@/components/ui/Icons";
 
 interface ProjectCardProps {
   project: Project;
   index: number;
+  totalProjects?: number;
+  isSelected?: boolean;
+  onSelectProject?: (project: Project) => void;
 }
 
-export default function ProjectCard({ project, index }: ProjectCardProps) {
+export default function ProjectCard({
+  project,
+  index,
+  totalProjects = 5,
+  isSelected = false,
+  onSelectProject,
+}: ProjectCardProps) {
   const cardRef = useRef<HTMLElement | null>(null);
-  const [tilt, setTilt] = useState({
-    rotateX: 0,
-    rotateY: 0,
-    glareX: 50,
-    glareY: 50,
-    isHovered: false,
-  });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    // Smooth tilt rotation (-7° to +7°)
-    const rotateX = ((y - centerY) / centerY) * -7;
-    const rotateY = ((x - centerX) / centerX) * 7;
-    const glareX = (x / rect.width) * 100;
-    const glareY = (y / rect.height) * 100;
-
-    setTilt({
-      rotateX,
-      rotateY,
-      glareX,
-      glareY,
-      isHovered: true,
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({
-      rotateX: 0,
-      rotateY: 0,
-      glareX: 50,
-      glareY: 50,
-      isHovered: false,
-    });
-  };
+  const formattedNum = `0${index + 1}`;
 
   return (
-    <div className="project-discovery-card w-full h-full flex flex-col">
-      <article
-        ref={cardRef}
-        tabIndex={0}
-        aria-label={`Project: ${project.title}`}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className="group relative rounded-2xl overflow-hidden glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352] flex flex-col h-full focus:outline-none focus:ring-2 focus:ring-[#F0A352]"
-        style={{
-          transform: tilt.isHovered
-            ? `perspective(1000px) rotateX(${tilt.rotateX.toFixed(2)}deg) rotateY(${tilt.rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`
-            : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
-          transition: tilt.isHovered ? "transform 0.1s ease-out" : "transform 0.4s ease-out",
-          boxShadow: tilt.isHovered
-            ? "0 20px 40px -15px rgba(201, 111, 59, 0.35), 0 0 25px rgba(240, 163, 82, 0.15)"
-            : "0 10px 25px -10px rgba(0, 0, 0, 0.5)",
-        }}
-      >
-      {/* Specular 3D Holographic Glare Layer */}
-      {tilt.isHovered && (
-        <div
-          className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 rounded-2xl"
-          style={{
-            background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(240, 163, 82, 0.22) 0%, rgba(255, 232, 184, 0.08) 35%, transparent 65%)`,
-          }}
-        />
-      )}
-
-      {/* Discovery Node Beacon (Smooth non-flickering glowing aura) */}
-      <div className="absolute top-0 left-6 -translate-y-1/2 z-20 pointer-events-none">
-        <div className="relative flex items-center justify-center">
-          <span className="absolute inline-flex h-3 w-3 rounded-full bg-[#F0A352] opacity-40 scale-125" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F0A352] shadow-sm shadow-[#F0A352]" />
-        </div>
-      </div>
-
-      {/* Top Border Flow Light Flare */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F0A352] to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-
-      {/* Visual Header / Image Container */}
-      <div className="relative w-full h-64 sm:h-72 overflow-hidden bg-[#201C19]">
+    <article
+      ref={cardRef}
+      tabIndex={0}
+      aria-label={`Project ${formattedNum}: ${project.title}`}
+      onClick={() => onSelectProject?.(project)}
+      className={`group relative w-full h-full rounded-3xl overflow-hidden glass-panel border flex flex-col justify-between focus:outline-none focus:ring-2 focus:ring-[#F0A352] bg-[#181310] transition-all duration-300 select-none cursor-pointer ${
+        isSelected
+          ? "border-[#F0A352] ring-2 ring-[#F0A352]/50 shadow-[0_0_40px_rgba(240,163,82,0.35)]"
+          : "border-[#C96F3B]/35 hover:border-[#F0A352] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.92)]"
+      }`}
+    >
+      {/* Background Project Image with Cinematic Gradient */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none">
         <Image
           src={project.image}
           alt={`Preview of ${project.title}`}
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-108 group-focus:scale-108"
+          priority={index === 0}
+          sizes="(max-width: 768px) 95vw, 85vw"
+          className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105 brightness-[0.70] contrast-[1.1]"
         />
+        {/* Multilayer gradient: ensures top tab and bottom text have 100% crystal contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#181310] via-[#181310]/65 to-[#181310]/35" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#181310]/85 via-transparent to-[#181310]/95" />
+      </div>
 
-        {/* Ambient Gradient Overlays for Cinematic Depth */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#201C19] via-[#201C19]/35 to-transparent opacity-85 group-hover:opacity-60 transition-opacity duration-500" />
+      {/* Dim Overlay when card is stacked underneath (Controlled by GSAP) */}
+      <div className="card-dim-overlay absolute inset-0 bg-[#0E0C0A] opacity-0 pointer-events-none z-30 transition-opacity duration-300 rounded-3xl" />
 
-        {/* Top Badges */}
-        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10 pointer-events-none">
-          <span className="px-3 py-1 rounded-full text-xs font-mono bg-[#201C19]/90 backdrop-blur-md text-[#F0A352] border border-[#C96F3B]/40 flex items-center gap-1.5 shadow-md">
-            <span className="text-[10px] font-bold">PROJECT 0{index + 1}</span>
-            <span className="text-[#F5EFE5]/40">•</span>
-            <span>{project.category}</span>
+      {/* Top Border Amber Glow Flare */}
+      <div
+        className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F0A352] to-transparent transition-opacity duration-500 z-20 ${
+          isSelected ? "opacity-100" : "opacity-60 group-hover:opacity-100"
+        }`}
+      />
+
+      {/* 1. TACTILE TOP TAB HEADER: Remains permanently exposed & touchable when stacked */}
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelectProject?.(project);
+        }}
+        className={`px-4 sm:px-8 py-3 sm:py-3.5 flex items-center justify-between border-b transition-colors relative z-20 cursor-pointer ${
+          isSelected
+            ? "bg-[#281F1B] border-[#F0A352]"
+            : "bg-[#1D1714]/92 backdrop-blur-md border-[#C96F3B]/30 hover:bg-[#281F1B] hover:border-[#F0A352]/60"
+        }`}
+      >
+        <div className="flex items-center gap-2.5 sm:gap-3.5">
+          <span
+            className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold transition-all shadow-sm ${
+              isSelected
+                ? "bg-[#F0A352] text-[#181310] ring-2 ring-[#F0A352]/40"
+                : "bg-[#F0A352]/20 text-[#F0A352] border border-[#F0A352]/45 group-hover:bg-[#F0A352]/30"
+            }`}
+          >
+            {formattedNum}
           </span>
+          <span className="text-xs sm:text-sm font-serif font-bold text-[#F5EFE5] group-hover:text-[#F0A352] transition-colors truncate max-w-[130px] sm:max-w-xs">
+            {project.title}
+          </span>
+          <span className="text-[10px] font-mono text-[#F5EFE5]/50 uppercase tracking-wider hidden md:inline">
+            • {project.category}
+          </span>
+        </div>
 
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#392820]/95 text-[#F5EFE5]/85 border border-[#C96F3B]/30 flex items-center gap-1">
-            <Sparkles className="w-2.5 h-2.5 text-[#F0A352]" />
-            <span>Featured</span>
+        <div className="flex items-center gap-2 sm:gap-3 text-xs font-mono text-[#F0A352]">
+          <span className="text-[11px] text-[#FFE8B8]/80 hidden sm:inline">{project.year}</span>
+          <span
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold transition-all ${
+              isSelected
+                ? "bg-[#F0A352] text-[#181310] shadow-[0_0_12px_#F0A352]"
+                : "bg-[#2E2018] border border-[#C96F3B]/35 text-[#F0A352] group-hover:border-[#F0A352] group-hover:bg-[#F0A352] group-hover:text-[#181310]"
+            }`}
+          >
+            <span>{isSelected ? "Inspecting" : "Inspect"}</span>
+            <ArrowUpRight className="w-3 h-3" />
           </span>
         </div>
       </div>
 
-      {/* Card Body */}
-      <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between relative z-10 bg-[#201C19]/95 backdrop-blur-md">
-        <div>
-          {/* Title & Year */}
-          <div className="flex items-baseline justify-between gap-4 mb-2">
-            <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#F5EFE5] group-hover:text-[#F0A352] transition-colors duration-300">
-              {project.title}
-            </h3>
-            <span className="text-xs font-mono text-[#F0A352]/80">{project.year}</span>
-          </div>
+      {/* 2. BOTTOM CONTENT: Clean, reduced text, bold title, tags & action links */}
+      <div className="p-5 sm:p-8 relative z-20 flex flex-col justify-end">
+        {/* Title */}
+        <h3 className="text-xl sm:text-3xl md:text-4xl font-serif font-bold text-[#F5EFE5] group-hover:text-[#F0A352] transition-colors duration-300 tracking-tight mb-2">
+          {project.title}
+        </h3>
 
-          {/* Description */}
-          <p className="text-sm sm:text-base text-[#F5EFE5]/80 font-sans leading-relaxed mb-6 font-light">
-            {project.description}
-          </p>
-        </div>
+        {/* Short, crisp description */}
+        <p className="text-xs sm:text-sm text-[#F5EFE5]/80 font-sans font-light leading-relaxed max-w-2xl mb-4 line-clamp-2">
+          {project.description}
+        </p>
 
-        <div>
-          {/* Tech Stack Pills */}
-          <div className="flex flex-wrap gap-2 mb-6" aria-label="Technologies used">
+        {/* Tech tags & links row */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#C96F3B]/25">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {project.techStack.map((tech) => (
               <span
                 key={tech}
-                className="px-2.5 py-1 rounded-md text-xs font-mono text-[#F5EFE5]/85 bg-[#392820]/90 border border-[#C96F3B]/25 group-hover:border-[#F0A352]/50 group-hover:bg-[#4A3326] transition-all duration-300"
+                className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-mono text-[#F5EFE5]/85 bg-[#201C19]/80 border border-[#C96F3B]/25 backdrop-blur-sm"
               >
                 {tech}
               </span>
             ))}
           </div>
 
-          {/* Action Links */}
-          <div className="flex items-center justify-between pt-4 border-t border-[#C96F3B]/20">
-            <div className="flex items-center gap-3">
-              {project.githubUrl && (
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-mono text-[#F5EFE5]/75 hover:text-[#F0A352] transition-colors px-2.5 py-1 rounded-md hover:bg-[#392820]"
-                  aria-label={`View source code for ${project.title} on GitHub`}
-                >
-                  <GithubIcon className="w-3.5 h-3.5" />
-                  <span>Source</span>
-                </a>
-              )}
-            </div>
+          <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1.5 text-xs font-mono text-[#F5EFE5]/80 hover:text-[#F0A352] transition-colors px-3 py-1.5 rounded-lg bg-[#201C19]/80 hover:bg-[#2D1E16] border border-[#C96F3B]/25 backdrop-blur-sm"
+                aria-label={`View source code for ${project.title}`}
+              >
+                <GithubIcon className="w-3.5 h-3.5" />
+                <span>Code</span>
+              </a>
+            )}
 
             {project.liveUrl && (
               <a
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#F0A352] hover:text-[#F5EFE5] bg-[#C96F3B]/25 hover:bg-[#C96F3B] px-3.5 py-1.5 rounded-full border border-[#C96F3B]/50 hover:border-[#F0A352] transition-all duration-300 shadow-md shadow-[#C96F3B]/20 group-hover:scale-105"
-                aria-label={`View live demo of ${project.title}`}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#201C19] bg-gradient-to-r from-[#F0A352] to-[#FFE8B8] hover:brightness-110 px-4 py-1.5 rounded-full transition-all duration-300 shadow-md shadow-[#F0A352]/25"
+                aria-label={`View live project ${project.title}`}
               >
-                <span>Live Demo</span>
-                <ExternalLink className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <span>Live</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
               </a>
             )}
           </div>
         </div>
       </div>
     </article>
-  </div>
-);
+  );
 }
