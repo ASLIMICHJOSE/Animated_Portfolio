@@ -13,7 +13,7 @@ export default function Navbar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
 
-      const sections = ["hero", "about", "skills", "projects", "journey", "contact"];
+      const sections = ["hero", "about", "skills", "projects", "journey", "certifications", "contact"];
       const scrollPosition = window.scrollY + 250;
 
       for (const sectionId of sections) {
@@ -39,7 +39,8 @@ export default function Navbar() {
     { name: "Skills", href: "#skills", id: "skills", label: "03" },
     { name: "Projects", href: "#projects", id: "projects", label: "04" },
     { name: "Journey", href: "#journey", id: "journey", label: "05" },
-    { name: "Contact", href: "#contact", id: "contact", label: "06" },
+    { name: "Certs", href: "#certifications", id: "certifications", label: "06" },
+    { name: "Contact", href: "#contact", id: "contact", label: "07" },
   ];
 
   return (
@@ -56,7 +57,7 @@ export default function Navbar() {
           </div>
           <div className="hidden sm:flex flex-col">
             <span className="font-serif font-bold text-sm text-[#F5EFE5] tracking-wide group-hover:text-[#F0A352] transition-colors">
-              ASLI MICH JOSE
+              ASLI MICH JOSE J
             </span>
             <span className="text-[10px] font-mono text-[#F0A352]/80 tracking-widest uppercase">
               Creative Developer

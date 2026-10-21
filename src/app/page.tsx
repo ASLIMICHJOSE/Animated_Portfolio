@@ -2,13 +2,13 @@ import Navbar from "@/components/navigation/Navbar";
 import FallingLeaves from "@/components/animation/FallingLeaves";
 import CinematicWorld3D from "@/components/animation/CinematicWorld3D";
 import SmoothScroll from "@/components/animation/SmoothScroll";
-import ScrollFlowCompanion from "@/components/animation/ScrollFlowCompanion";
 import ContinuousSectionConduit from "@/components/animation/ContinuousSectionConduit";
 import HeroSection from "@/components/sections/HeroSection";
 import AboutSection from "@/components/sections/AboutSection";
 import SkillsSection from "@/components/sections/SkillsSection";
 import ProjectsSection from "@/components/sections/ProjectsSection";
 import JourneySection from "@/components/sections/JourneySection";
+import CertificationsSection from "@/components/sections/CertificationsSection";
 import ContactSection from "@/components/sections/ContactSection";
 
 export default function Home() {
@@ -18,10 +18,7 @@ export default function Home() {
         {/* Continuous 3D WebGL Camera Flight World */}
         <CinematicWorld3D />
 
-        {/* Motion Graphics Flow Guide & Discovery Companion */}
-        <ScrollFlowCompanion />
-
-        {/* Interactive Physics Leaf Catcher Bucket & Ambient Leaves */}
+        {/* Interactive Ambient Leaves */}
         <FallingLeaves />
 
         {/* Global Navigation */}
@@ -47,7 +44,10 @@ export default function Home() {
           {/* Section E: Visual Learning Journey */}
           <JourneySection />
 
-          {/* Section F: Twilight Contact Scene & Footer */}
+          {/* Section F: Verified Industry Certifications */}
+          <CertificationsSection />
+
+          {/* Section G: Twilight Contact Scene & Footer */}
           <ContactSection />
         </main>
       </div>

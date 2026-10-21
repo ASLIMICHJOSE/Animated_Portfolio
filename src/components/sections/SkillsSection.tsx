@@ -61,7 +61,13 @@ export default function SkillsSection() {
     const ctx = gsap.context(() => {
       // Total travel distance across all cards
       const getTotalTravel = () => {
-        return Math.max(0, track.scrollWidth - window.innerWidth + 80);
+        return Math.max(0, track.scrollWidth - window.innerWidth + 100);
+      };
+
+      // Calibrate pinned scroll distance so horizontal scroll matches natural vertical velocity
+      const getScrollDistance = () => {
+        const travel = getTotalTravel();
+        return Math.max(Math.round(window.innerHeight * 2.8), Math.round(travel * 1.15));
       };
 
       // 1. "Before it set": Vertical scroll takes ~2 scrolls while cards slide in from the right
@@ -75,15 +81,15 @@ export default function SkillsSection() {
             scrollTrigger: {
               trigger: section,
               start: "top 95%",
-              end: "top top", // Reaches set position right as top of section hits top of viewport
-              scrub: 0.8,
+              end: "top top",
+              scrub: 1.0,
               invalidateOnRefresh: true,
             },
           }
         );
       }
 
-      // 2. "Once set": Section locks/pins at top top. Exactly 1 scroll is enough to finish!
+      // 2. "Once set": Section pins at top top with silky smooth horizontal motion matching vertical scroll
       gsap.fromTo(
         track,
         { x: 0 },
@@ -92,10 +98,10 @@ export default function SkillsSection() {
           ease: "none",
           scrollTrigger: {
             trigger: section,
-            start: "top top", // Once set in position
-            end: () => `+=${Math.round(window.innerHeight * 0.85)}`, // Exactly 1 scroll is enough!
+            start: "top top",
+            end: () => `+=${getScrollDistance()}`,
             pin: true,
-            scrub: 0.6, // Silky, responsive momentum scrub
+            scrub: 1.0, // Silky, momentum-matched Lenis scrub
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
@@ -119,8 +125,8 @@ export default function SkillsSection() {
             scrollTrigger: {
               trigger: section,
               start: "top top",
-              end: () => `+=${Math.round(window.innerHeight * 0.85)}`,
-              scrub: true,
+              end: () => `+=${getScrollDistance()}`,
+              scrub: 1.0,
               invalidateOnRefresh: true,
             },
           }
@@ -135,8 +141,8 @@ export default function SkillsSection() {
           scrollTrigger: {
             trigger: section,
             start: "top top",
-            end: () => `+=${Math.round(window.innerHeight * 0.85)}`,
-            scrub: true,
+            end: () => `+=${getScrollDistance()}`,
+            scrub: 1.0,
             invalidateOnRefresh: true,
           },
         });

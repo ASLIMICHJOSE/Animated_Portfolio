@@ -69,7 +69,7 @@ export default function ProjectsSection() {
       // TAB_OFFSET ensures when cards stack, every card's top tab (42px) remains visible & touchable!
       const TAB_OFFSET = 42;
 
-      // Initial State: Card 0 sits at y: 0. Cards 1..N start below viewport
+      // Initial State: Card 0 sits at y: 0. Cards 1..N start just below viewport
       cards.forEach((card, i) => {
         gsap.set(card, {
           transformOrigin: "top center",
@@ -83,7 +83,7 @@ export default function ProjectsSection() {
           });
         } else {
           gsap.set(card, {
-            yPercent: 120,
+            yPercent: 100,
             y: i * TAB_OFFSET,
             scale: 1,
             opacity: 1,
@@ -91,8 +91,8 @@ export default function ProjectsSection() {
         }
       });
 
-      // Pin distance calibrated for smooth 5-card progression
-      const pinDistance = Math.round(window.innerHeight * (total * 0.95));
+      // Pin distance calibrated for responsive, continuous 5-card flow without dead zones
+      const pinDistance = Math.round(window.innerHeight * (total - 1) * 0.85);
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -101,7 +101,7 @@ export default function ProjectsSection() {
           start: "top top",
           end: `+=${pinDistance}`,
           pin: true,
-          scrub: 0.7, // Silky Lenis momentum scrub
+          scrub: 0.5, // Responsive 1:1 sync with Lenis smooth scroll
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
@@ -110,18 +110,17 @@ export default function ProjectsSection() {
             }
             const currentStep = Math.min(
               total - 1,
-              Math.floor(self.progress * total)
+              Math.floor(self.progress * (total - 0.02))
             );
             setActiveIndex(currentStep);
           },
         },
       });
 
-      // Stacking sequence: Each card glides up to its designated y: i * TAB_OFFSET
-      // All prior cards j < i remain visible with their top tab exposed at j * TAB_OFFSET!
+      // Seamless, gapless stacking sequence (0->1, 1->2, 2->3, 3->4)
       for (let i = 1; i < total; i++) {
         const card = cards[i];
-        const stepTime = (i - 1) * 1.5;
+        const startTime = i - 1;
 
         // Card i slides up smoothly into position at y: i * TAB_OFFSET
         tl.to(
@@ -129,11 +128,10 @@ export default function ProjectsSection() {
           {
             yPercent: 0,
             y: i * TAB_OFFSET,
-            scale: 1,
-            ease: "power2.inOut",
+            ease: "power1.inOut",
             duration: 1.0,
           },
-          stepTime
+          startTime
         );
 
         // Preceding cards scale subtly from top center & dim, preserving top tabs
@@ -143,16 +141,16 @@ export default function ProjectsSection() {
           const depth = i - j;
 
           const backScale = Math.max(0.92, 1 - depth * 0.02);
-          const targetDim = Math.min(0.65, depth * 0.22);
+          const targetDim = Math.min(0.6, depth * 0.18);
 
           tl.to(
             priorCard,
             {
               scale: backScale,
-              ease: "power2.inOut",
+              ease: "power1.inOut",
               duration: 1.0,
             },
-            stepTime
+            startTime
           );
 
           if (priorOverlay) {
@@ -160,17 +158,12 @@ export default function ProjectsSection() {
               priorOverlay,
               {
                 opacity: targetDim,
-                ease: "power2.inOut",
+                ease: "power1.inOut",
                 duration: 1.0,
               },
-              stepTime
+              startTime
             );
           }
-        }
-
-        // Brief reading hold between stacks
-        if (i < total - 1) {
-          tl.to({}, { duration: 0.35 });
         }
       }
     }, sectionRef);

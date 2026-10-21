@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Sparkles, BookOpen, Heart } from "lucide-react";
+import { Sparkles, BookOpen, Heart, GraduationCap, Briefcase } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { portfolioData } from "@/data/portfolio";
 import { initGSAP } from "@/lib/animations";
@@ -161,18 +161,19 @@ export default function AboutSection() {
               {/* Image Container */}
               <div className="relative h-80 sm:h-96 w-full overflow-hidden">
                 <Image
-                  src="/images/project-autumn-workspace.jpg"
-                  alt="Developer desk bathed in autumn golden sunlight"
+                  src="/images/asli-mich-jose.jpg"
+                  alt="Asli Mich Jose - Full-Stack Web & Frontend Developer"
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#201C19] via-transparent to-transparent opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#201C19] via-[#201C19]/20 to-transparent opacity-90" />
 
                 {/* Corner Crest */}
                 <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#201C19]/85 backdrop-blur-md border border-[#F0A352]/40 text-xs font-mono text-[#F0A352] flex items-center gap-1.5 shadow-md">
                   <Sparkles className="w-3 h-3 text-[#F0A352]" />
-                  <span>The Creative Studio</span>
+                  <span>Asli Mich Jose · Profile</span>
                 </div>
               </div>
 
@@ -211,6 +212,43 @@ export default function AboutSection() {
                   {paragraph}
                 </p>
               ))}
+            </div>
+
+            {/* Education & Experience Credentials Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Education Card */}
+              <div className="p-4 sm:p-5 rounded-2xl glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352] transition-colors bg-[#181310]/85">
+                <div className="flex items-center gap-2.5 text-xs font-mono text-[#F0A352] uppercase tracking-wider mb-2">
+                  <GraduationCap className="w-4 h-4 text-[#F0A352]" />
+                  <span>Education</span>
+                </div>
+                <h4 className="text-sm sm:text-base font-serif font-bold text-[#F5EFE5] leading-snug">
+                  {portfolioData.personal.education.degree}
+                </h4>
+                <p className="text-xs text-[#FFE8B8] mt-1 font-mono">
+                  {portfolioData.personal.education.institution}
+                </p>
+                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-[#2D1E16] text-[#F0A352] border border-[#C96F3B]/30">
+                  {portfolioData.personal.education.period}
+                </span>
+              </div>
+
+              {/* Experience Card */}
+              <div className="p-4 sm:p-5 rounded-2xl glass-panel border border-[#C96F3B]/30 hover:border-[#F0A352] transition-colors bg-[#181310]/85">
+                <div className="flex items-center gap-2.5 text-xs font-mono text-[#F0A352] uppercase tracking-wider mb-2">
+                  <Briefcase className="w-4 h-4 text-[#F0A352]" />
+                  <span>Industry Experience</span>
+                </div>
+                <h4 className="text-sm sm:text-base font-serif font-bold text-[#F5EFE5] leading-snug">
+                  {portfolioData.personal.experience[0].role}
+                </h4>
+                <p className="text-xs text-[#FFE8B8] mt-1 font-mono">
+                  {portfolioData.personal.experience[0].company}
+                </p>
+                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-[#2D1E16] text-[#F0A352] border border-[#C96F3B]/30">
+                  {portfolioData.personal.experience[0].period}
+                </span>
+              </div>
             </div>
 
             {/* Current Learning Goals */}

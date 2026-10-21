@@ -8,6 +8,7 @@ import {
   ArrowUp,
   Send,
   Sparkles,
+  Phone,
 } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
@@ -249,6 +250,18 @@ export default function ContactSection() {
                 ariaLabel="Visit LinkedIn profile"
               >
                 LinkedIn
+              </Button>
+            )}
+
+            {portfolioData.socials.phone && (
+              <Button
+                href={`tel:${portfolioData.socials.phone.replace(/[^0-9+]/g, "")}`}
+                variant="outline"
+                size="md"
+                icon={<Phone className="w-4 h-4" />}
+                ariaLabel="Call Asli Mich Jose J"
+              >
+                {portfolioData.socials.phone}
               </Button>
             )}
           </div>
