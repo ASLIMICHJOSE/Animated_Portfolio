@@ -1,6 +1,5 @@
 import Navbar from "@/components/navigation/Navbar";
-import FallingLeaves from "@/components/animation/FallingLeaves";
-import CinematicWorld3D from "@/components/animation/CinematicWorld3D";
+import AmbientEffects from "@/components/animation/AmbientEffects";
 import SmoothScroll from "@/components/animation/SmoothScroll";
 import ContinuousSectionConduit from "@/components/animation/ContinuousSectionConduit";
 import HeroSection from "@/components/sections/HeroSection";
@@ -16,10 +15,7 @@ export default function Home() {
     <SmoothScroll>
       <div className="relative min-h-screen bg-[#201C19] text-[#F5EFE5] film-grain selection:bg-[#C96F3B]/30 selection:text-[#F5EFE5]">
         {/* Continuous 3D WebGL Camera Flight World */}
-        <CinematicWorld3D />
-
-        {/* Interactive Ambient Leaves */}
-        <FallingLeaves />
+        <AmbientEffects />
 
         {/* Global Navigation */}
         <Navbar />

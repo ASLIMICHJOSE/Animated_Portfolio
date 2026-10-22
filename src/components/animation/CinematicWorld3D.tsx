@@ -15,7 +15,7 @@ export default function CinematicWorld3D() {
     const container = containerRef.current;
     if (!container) return;
 
-    const { gsap, ScrollTrigger } = initGSAP();
+    const { ScrollTrigger } = initGSAP();
 
     // Scene & Camera setup
     const scene = new THREE.Scene();
@@ -26,13 +26,19 @@ export default function CinematicWorld3D() {
 
     const camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 1500);
 
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+    const isConstrainedDevice =
+      width < 768 ||
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      (deviceMemory && deviceMemory <= 4);
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
       antialias: false, // Antialias off at native resolution saves ~30% GPU shader cost
       powerPreference: "high-performance",
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2)); // Capped at 1.2 saves up to 60% fill-rate on high-DPI
+    const pixelRatio = Math.min(window.devicePixelRatio, isConstrainedDevice ? 0.9 : 1.2);
+    renderer.setPixelRatio(pixelRatio); // Cap fill-rate, especially on high-DPI mobile screens.
     renderer.toneMapping = THREE.LinearToneMapping;
     renderer.toneMappingExposure = 1.05;
     container.appendChild(renderer.domElement);
@@ -141,7 +147,7 @@ export default function CinematicWorld3D() {
     });
 
     // 3D Swirling Autumn Leaf / Ember Particles along camera spline (Optimized for low-end GPU)
-    const particleCount = 75;
+    const particleCount = isConstrainedDevice ? 48 : 75;
     const particleGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
@@ -224,6 +230,7 @@ export default function CinematicWorld3D() {
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
+      renderer.setPixelRatio(pixelRatio);
     };
     window.addEventListener("resize", handleResize);
 
@@ -233,10 +240,26 @@ export default function CinematicWorld3D() {
     const currentLookPos = new THREE.Vector3();
 
     let animationId: number;
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
+    let pageVisible = !document.hidden;
+    let lastFrame = 0;
+    const targetFrameInterval = isConstrainedDevice ? 1000 / 45 : 0;
+    const handleVisibilityChange = () => {
+      pageVisible = !document.hidden;
+      if (pageVisible) clock.start();
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    const animate = () => {
-      const delta = clock.getDelta();
+    const animate = (now: number) => {
+      if (!pageVisible) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+      if (targetFrameInterval && now - lastFrame < targetFrameInterval) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrame = now;
       const elapsedTime = clock.getElapsedTime();
 
       // Smooth camera interpolation towards scroll progress
@@ -295,12 +318,19 @@ export default function CinematicWorld3D() {
 
     return () => {
       cancelAnimationFrame(animationId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("resize", handleResize);
       renderer.dispose();
       particleGeo.dispose();
       particleMat.dispose();
+      particleTex.dispose();
       beamGeo.dispose();
       beamMat.dispose();
+      crossGeo.dispose();
+      zoneMaterials.forEach((material) => {
+        material.map?.dispose();
+        material.dispose();
+      });
       if (container && renderer.domElement.parentNode === container) {
         container.removeChild(renderer.domElement);
       }

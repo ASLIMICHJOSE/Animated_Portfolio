@@ -96,10 +96,10 @@ export const portfolioData: PortfolioData = {
     name: "ASLI MICH JOSE J",
     title: "Full-Stack Web & Frontend Developer",
     tagline:
-      "Computer Science Engineering student with frontend development internship experience and hands-on expertise building full-stack web, AI-powered, and e-commerce applications.",
+      "Computer Science Engineering student with frontend development internship experience and hands-on experience building full-stack web applications. Proficient in JavaScript, React.js, Node.js, Express.js, REST APIs, and MongoDB. Experienced in developing responsive user interfaces and AI-powered and e-commerce applications.",
     bio: [
-      "I am a Computer Science Engineering student at Stella Mary's College of Engineering (2023–2027) with frontend development internship experience at Admini and a proven track record of engineering full-stack web applications.",
-      "Proficient across JavaScript, React.js, Node.js, Express.js, REST APIs, and MongoDB. Passionate about architecting responsive user interfaces, AI-powered guidance tools, and scalable e-commerce systems with clean engineering standards."
+      "Computer Science Engineering student at Stella Mary's College of Engineering (2023–2027) with frontend development internship experience at Admini and hands-on experience building full-stack web applications.",
+      "Proficient in JavaScript, React.js, Node.js, Express.js, REST APIs, and MongoDB. Experienced in developing responsive user interfaces and AI-powered and e-commerce applications."
     ],
     philosophy:
       "Code is the structural foundation; user experience is the human connection. A great digital solution balances rigorous architecture with effortless, engaging interaction.",
@@ -132,9 +132,9 @@ export const portfolioData: PortfolioData = {
         location: "Remote / Hybrid",
         highlights: [
           "Developed responsive and reusable user interface components using React.js, JavaScript, and Tailwind CSS.",
-          "Integrated REST APIs to retrieve and display backend data seamlessly within frontend components.",
-          "Debugged UI issues and performed systematic troubleshooting to enhance overall application usability.",
-          "Collaborated closely with the engineering team to implement frontend requirements and maintain consistent user experiences."
+          "Integrated REST APIs to retrieve and display backend data within frontend components.",
+          "Debugged UI issues and performed troubleshooting to improve application usability.",
+          "Collaborated with the engineering team to implement frontend requirements and maintain consistent user experiences."
         ],
         technologies: ["React.js", "JavaScript", "Tailwind CSS", "REST APIs", "Git"]
       }
@@ -148,55 +148,59 @@ export const portfolioData: PortfolioData = {
   },
   skillCategories: [
     {
-      title: "Web Development",
-      subtitle: "Full-Stack & Frontend Ecosystem",
+      title: "Languages",
+      subtitle: "Programming & Scripting Languages",
       skills: [
-        { name: "React.js", description: "Reusable component hierarchies & hooks" },
-        { name: "Node.js", description: "Asynchronous backend runtimes & services" },
-        { name: "Express.js", description: "RESTful API routing & middleware architecture" },
-        { name: "HTML5 & CSS3", description: "Semantic markup, modern responsive styling" },
+        { name: "Java", description: "Object-oriented software development & structured systems" },
+        { name: "JavaScript", description: "Modern ES6+, asynchronous patterns & DOM manipulation" },
+        { name: "Python", description: "Scripting, automation, data handling & AI workflows" },
+        { name: "C", description: "Low-level system architecture, memory & pointer operations" },
+        { name: "C++", description: "Object-oriented systems, algorithms & high performance" },
+        { name: "Dart", description: "Cross-platform mobile & UI engineering fundamentals" }
+      ]
+    },
+    {
+      title: "Web Development",
+      subtitle: "Frontend & Full-Stack Technologies",
+      skills: [
+        { name: "React.js", description: "Reusable component hierarchies, state management & hooks" },
+        { name: "HTML5", description: "Semantic markup, accessibility & document standards" },
+        { name: "CSS3", description: "Modern responsive styling, flexbox, grid & keyframes" },
         { name: "Tailwind CSS", description: "Utility-first design systems & custom themes" },
+        { name: "Node.js", description: "Asynchronous backend runtimes & event-driven services" },
+        { name: "Express.js", description: "RESTful API routing, middleware architecture & controllers" },
         { name: "REST APIs", description: "Clean client-server contracts & data integration" }
       ]
     },
     {
-      title: "Programming Languages",
-      subtitle: "Core Typed & Scripting Languages",
+      title: "Databases",
+      subtitle: "Data Storage & Query Engines",
       skills: [
-        { name: "JavaScript (ES6+)", description: "Async patterns, promises, DOM manipulation" },
-        { name: "Java", description: "Object-oriented software design & architectures" },
-        { name: "Python", description: "Scripting, data handling, and AI tooling" },
-        { name: "C & C++", description: "Memory management, algorithms & system fundamentals" },
-        { name: "Dart", description: "Cross-platform mobile & UI engineering basics" }
-      ]
-    },
-    {
-      title: "Databases & Storage",
-      subtitle: "Persistence & Vector Stores",
-      skills: [
-        { name: "MongoDB", description: "Document schemas, Atlas, aggregation & vector search" },
+        { name: "MongoDB", description: "Document schemas, Atlas cloud, aggregation & vector search" },
         { name: "Supabase", description: "PostgreSQL persistence, Auth & real-time subscriptions" },
-        { name: "SQL", description: "Relational queries, table relations & joins" }
+        { name: "SQL", description: "Relational queries, schema design, table joins & normalization" }
       ]
     },
     {
-      title: "Core Computer Science",
-      subtitle: "Foundational Engineering Disciplines",
+      title: "Core CS",
+      subtitle: "Computer Science Engineering Foundations",
       skills: [
-        { name: "Data Structures & Algorithms (DSA)", description: "Trees, graphs, dynamic programming, complexity analysis" },
-        { name: "Object-Oriented Programming (OOP)", description: "Encapsulation, inheritance, polymorphism & design patterns" },
-        { name: "Database Management Systems (DBMS)", description: "ACID properties, indexing, normalization & transactions" },
+        { name: "DSA", description: "Data Structures & Algorithms, trees, graphs & complexity" },
+        { name: "OOP", description: "Object-Oriented Programming, inheritance, polymorphism & patterns" },
+        { name: "DBMS", description: "Database Management Systems, ACID properties & indexing" },
         { name: "Operating Systems", description: "Process scheduling, concurrency, threads & memory hierarchy" }
       ]
     },
     {
       title: "Tools & Deployment",
-      subtitle: "Developer Toolchain & Cloud DevOps",
+      subtitle: "DevOps & Engineering Toolchain",
       skills: [
-        { name: "Git & GitHub", description: "Branching strategies, pull requests & code review" },
-        { name: "Postman", description: "API testing, automated endpoint verification" },
-        { name: "Microsoft Azure", description: "Cloud computing fundamentals & resource management" },
-        { name: "Vercel & Render", description: "Continuous deployment pipelines for web & backend services" }
+        { name: "Git", description: "Distributed version control & branching workflows" },
+        { name: "GitHub", description: "Collaborative repository workflows & code review" },
+        { name: "Postman", description: "API endpoint testing, contract validation & mocking" },
+        { name: "Azure", description: "Microsoft Azure cloud services & infrastructure" },
+        { name: "Vercel", description: "Edge hosting & zero-config production deployments" },
+        { name: "Render", description: "Cloud backend hosting for web services & APIs" }
       ]
     }
   ],
@@ -204,51 +208,49 @@ export const portfolioData: PortfolioData = {
     {
       id: "project-careerforge",
       title: "CareerForge",
-      category: "AI-Powered Career Platform",
+      category: "AI-Powered Career Guidance Platform",
       year: "2025–2026",
       role: "Lead Full-Stack AI Engineer",
       description:
-        "An AI-powered career guidance platform featuring automated resume parsing, ATS scoring engine, document verification, skill assessment, and personalized learning roadmaps.",
+        "A full-stack career guidance platform featuring automated resume parsing, ATS scoring engine, document verification, skill assessment, and personalized learning roadmaps.",
       techStack: ["React.js", "Node.js", "Express.js", "MongoDB", "REST APIs", "AI APIs"],
       image: "/images/project-careerforge.jpg",
       githubUrl: "https://github.com/ASLIMICHJOSE/CareerForge",
       liveUrl: "https://github.com/ASLIMICHJOSE/CareerForge",
       featured: true,
       highlights: [
-        "Architected full-stack career platform with automated resume parsing and multi-format document verification",
-        "Engineered an ATS Score Engine calculating keyword density, formatting compliance, and job match compatibility",
-        "Integrated AI APIs to analyze skill gaps and generate personalized learning roadmaps with career recommendations",
-        "Connected responsive React.js frontend with secure Express.js and MongoDB backend services"
+        "Developed a full-stack career guidance platform featuring resume parsing, document verification, and skill assessment.",
+        "Integrated AI APIs to generate personalized career recommendations and learning roadmaps.",
+        "Connected frontend components with backend services to support application functionality."
       ],
       metrics: [
-        { label: "ATS Accuracy", value: "95%" },
-        { label: "Parsing Speed", value: "< 1.2s" },
-        { label: "API Endpoints", value: "24+" }
+        { label: "Resume Parsing", value: "< 1.2s" },
+        { label: "Verification", value: "Real-time" },
+        { label: "Roadmap Engine", value: "AI-Driven" }
       ]
     },
     {
       id: "project-serofast",
       title: "SeroFast",
-      category: "Hyperlocal E-Commerce",
+      category: "Hyperlocal E-Commerce Platform",
       year: "2025",
       role: "Full-Stack Developer",
       description:
-        "A high-speed hyperlocal e-commerce marketplace built with React 18, Vite 6, Express.js, and Supabase, featuring instant product catalogs, shopping carts, and order processing.",
-      techStack: ["React 18", "Vite 6", "Node.js", "Express.js", "Supabase", "Tailwind CSS v4"],
+        "A responsive e-commerce application with product management and shopping cart functionality, user authentication, and order-processing workflows.",
+      techStack: ["React.js", "Node.js", "Express.js", "Supabase", "Tailwind CSS"],
       image: "/images/project-serofast.jpg",
       githubUrl: "https://github.com/Abinesh00173/serofast",
       liveUrl: "https://github.com/Abinesh00173/serofast",
       featured: true,
       highlights: [
-        "Engineered responsive e-commerce web application with real-time product search, filtering, and persistent cart",
-        "Implemented secure user authentication and order-processing workflows powered by Supabase backend services",
-        "Developed full-stack frontend and Express.js REST APIs to support high-concurrency order operations",
-        "Designed mobile-first component architecture using Tailwind CSS v4 design tokens"
+        "Built a responsive e-commerce application with product management and shopping cart functionality.",
+        "Implemented user authentication and order-processing workflows.",
+        "Developed frontend and backend components to support product and order-related operations."
       ],
       metrics: [
-        { label: "Checkout Latency", value: "< 80ms" },
-        { label: "Cart Speed", value: "60 FPS" },
-        { label: "Mobile Responsive", value: "100%" }
+        { label: "Order Speed", value: "< 80ms" },
+        { label: "Shopping Cart", value: "Instant" },
+        { label: "Responsiveness", value: "100%" }
       ]
     },
     {
@@ -258,19 +260,20 @@ export const portfolioData: PortfolioData = {
       year: "2025–2026",
       role: "Frontend Developer Intern",
       description:
-        "Production-grade reusable React.js component architecture and REST API data layer engineered during internship at Admini.",
+        "Production-grade responsive UI component architecture and REST API integration developed during frontend developer internship at Admini.",
       techStack: ["React.js", "JavaScript", "Tailwind CSS", "REST APIs", "Git"],
       image: "/images/hero-autumn-city.jpg",
       githubUrl: "https://github.com/ASLIMICHJOSE",
       liveUrl: "https://github.com/ASLIMICHJOSE",
       featured: true,
       highlights: [
-        "Developed modular, accessible UI components deployed across production dashboards using React.js and Tailwind CSS",
-        "Integrated complex REST APIs to retrieve, transform, and render real-time backend operational data",
-        "Performed systematic UI debugging and usability troubleshooting to boost client task completion rates"
+        "Developed responsive and reusable user interface components using React.js, JavaScript, and Tailwind CSS.",
+        "Integrated REST APIs to retrieve and display backend data within frontend components.",
+        "Debugged UI issues and performed troubleshooting to improve application usability.",
+        "Collaborated with the engineering team to implement frontend requirements and maintain consistent user experiences."
       ],
       metrics: [
-        { label: "Component Reuse", value: "85%" },
+        { label: "UI Usability", value: "+45%" },
         { label: "Bug Reduction", value: "40%" },
         { label: "Page Speed", value: "0.8s" }
       ]
@@ -360,51 +363,6 @@ export const portfolioData: PortfolioData = {
   ],
   certifications: [
     {
-      id: "cert-mongodb-ai-agents",
-      title: "AI Agents with MongoDB",
-      issuer: "MongoDB, Inc.",
-      category: "Artificial Intelligence",
-      credentialId: "MDBzmy9d48cie",
-      period: "Issued 08-02-2026 · Verified",
-      issueDate: "08-02-2026",
-      signee: "Raghu Viswanathan (VP, Education, Academia, and Documentation)",
-      image: "/certificates/mongodb-ai-agents.png",
-      pdfUrl: "/certificates/mongodb-ai-agents.pdf",
-      description:
-        "Official Proof of Completion for engineering autonomous AI Agent architectures utilizing MongoDB as a persistent memory store, execution context, and tool-calling backend.",
-      skills: ["AI Agents", "MongoDB Atlas", "Tool Calling", "Autonomous Workflows", "Agent Memory"]
-    },
-    {
-      id: "cert-mongodb-ai-data-strategy",
-      title: "AI Data Strategy with MongoDB",
-      issuer: "MongoDB, Inc.",
-      category: "Database & AI",
-      credentialId: "MDB2g7794mb7u",
-      period: "Issued 08-02-2026 · Verified",
-      issueDate: "08-02-2026",
-      signee: "Raghu Viswanathan (VP, Education, Academia, and Documentation)",
-      image: "/certificates/mongodb-ai-data-strategy.png",
-      pdfUrl: "/certificates/mongodb-ai-data-strategy.pdf",
-      description:
-        "Official Proof of Completion for formulating AI data architecture strategies with MongoDB, incorporating vector embeddings, operational pipelines, and unified intelligent data storage.",
-      skills: ["AI Data Strategy", "MongoDB Atlas", "Vector Search", "Data Architecture", "Enterprise AI"]
-    },
-    {
-      id: "cert-simplilearn-full-stack",
-      title: "Full Stack Developer Certification",
-      issuer: "Simplilearn SkillUp",
-      category: "Software Engineering",
-      credentialId: "10635740",
-      period: "Issued 22nd Aug 2026 · Verified",
-      issueDate: "22nd August 2026",
-      signee: "Krishna Kumar (CEO, Simplilearn)",
-      image: "/certificates/simplilearn-full-stack.png",
-      pdfUrl: "/certificates/simplilearn-full-stack.pdf",
-      description:
-        "Official Certificate of Completion for rigorous full-stack web engineering curriculum covering modern frontend interfaces, backend server architectures, RESTful APIs, and database engineering.",
-      skills: ["Full Stack Web", "React.js", "Node.js", "REST APIs", "Database Engineering", "DevOps"]
-    },
-    {
       id: "cert-azure-fundamentals",
       title: "Microsoft Azure Fundamentals",
       issuer: "Microsoft",
@@ -435,6 +393,21 @@ export const portfolioData: PortfolioData = {
       skills: ["Vector Search", "Semantic Search", "Embeddings", "Atlas Vector Search"]
     },
     {
+      id: "cert-mongodb-ai-agents",
+      title: "AI Agents with MongoDB",
+      issuer: "MongoDB, Inc.",
+      category: "Artificial Intelligence",
+      credentialId: "MDBzmy9d48cie",
+      period: "Issued 08-02-2026 · Verified",
+      issueDate: "08-02-2026",
+      signee: "Raghu Viswanathan (VP, Education, Academia, and Documentation)",
+      image: "/certificates/mongodb-ai-agents.png",
+      pdfUrl: "/certificates/mongodb-ai-agents.pdf",
+      description:
+        "Official Proof of Completion for engineering autonomous AI Agent architectures utilizing MongoDB as a persistent memory store, execution context, and tool-calling backend.",
+      skills: ["AI Agents", "MongoDB Atlas", "Tool Calling", "Autonomous Workflows", "Agent Memory"]
+    },
+    {
       id: "cert-rag-mongodb",
       title: "RAG with MongoDB",
       issuer: "MongoDB, Inc.",
@@ -448,6 +421,36 @@ export const portfolioData: PortfolioData = {
       description:
         "Official Proof of Completion for Retrieval-Augmented Generation (RAG) system design connecting Large Language Models with real-time operational data stores and vector indexes.",
       skills: ["RAG Architecture", "LLM Integration", "Context Retrieval", "Prompt Optimization"]
+    },
+    {
+      id: "cert-mongodb-basics-students",
+      title: "MongoDB Basics for Students",
+      issuer: "MongoDB, Inc.",
+      category: "Database & AI",
+      credentialId: "MDBss777h85e3",
+      period: "Issued 07-16-2026 · Verified",
+      issueDate: "07-16-2026",
+      signee: "Raghu Viswanathan (VP, Education, Academia, and Documentation)",
+      image: "/certificates/mongodb-basics-students.png",
+      pdfUrl: "/certificates/mongodb-basics-students.pdf",
+      description:
+        "Official Proof of Completion for core MongoDB database concepts, document modeling, CRUD operations, indexing fundamentals, and Atlas cloud deployment.",
+      skills: ["MongoDB Atlas", "NoSQL", "Document Modeling", "CRUD Operations", "Database Indexing"]
+    },
+    {
+      id: "cert-ai-deep-learning",
+      title: "Artificial Intelligence and Deep Learning",
+      issuer: "Stella Mary's College of Engineering",
+      category: "Artificial Intelligence",
+      credentialId: "TSS11211",
+      period: "Issued 09/02/2026 · Verified",
+      issueDate: "09/02/2026",
+      signee: "Director-Operations (ISO 9001:2015)",
+      image: "/certificates/ai-deep-learning.png",
+      pdfUrl: "/certificates/ai-deep-learning.pdf",
+      description:
+        "Official Certificate of Completion for intensive technical workshop on Artificial Intelligence & Deep Learning covering neural networks, model training, computer vision, and predictive systems.",
+      skills: ["Artificial Intelligence", "Deep Learning", "Neural Networks", "Model Training", "Computer Vision"]
     },
     {
       id: "cert-career-essentials-software",

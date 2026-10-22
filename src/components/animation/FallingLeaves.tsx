@@ -53,19 +53,33 @@ export default function FallingLeaves() {
     if (!ctx) return;
 
     let animationFrameId: number;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+    const isConstrainedDevice =
+      window.innerWidth < 768 ||
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      (deviceMemory && deviceMemory <= 4);
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, isConstrainedDevice ? 1 : 1.5);
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    const resizeCanvas = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.round(width * pixelRatio);
+      canvas.height = Math.round(height * pixelRatio);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    };
+    resizeCanvas();
 
     const handleResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      resizeCanvas();
     };
 
     window.addEventListener("resize", handleResize, { passive: true });
 
     // Pointer velocity tracking for natural cursor wind
-    let mouseX = -1000;
-    let mouseY = -1000;
     let prevMouseX = -1000;
     let prevMouseY = -1000;
     let mouseVx = 0;
@@ -94,12 +108,12 @@ export default function FallingLeaves() {
         mouseVy = ((cy - prevMouseY) / dt) * 16;
       }
 
-      prevMouseX = mouseX = cx;
-      prevMouseY = mouseY = cy;
+      prevMouseX = cx;
+      prevMouseY = cy;
 
       // Spawn subtle golden stardust particles along cursor motion if moving with intent
       const speed = Math.hypot(mouseVx, mouseVy);
-      if (speed > 4 && Math.random() < 0.6) {
+      if (speed > 4 && ribbons.length < (isConstrainedDevice ? 18 : 36) && Math.random() < 0.6) {
         ribbons.push({
           x: cx + (Math.random() - 0.5) * 12,
           y: cy + (Math.random() - 0.5) * 12,
@@ -118,7 +132,7 @@ export default function FallingLeaves() {
     window.addEventListener("touchmove", handlePointerMove, { passive: true });
 
     // Pool of elegant falling maple leaves
-    const targetCount = width < 768 ? 12 : 20;
+    const targetCount = isConstrainedDevice ? 10 : 20;
     let leafIdCounter = 0;
 
     const createLeaf = (initialRandomY = false): Leaf => ({
@@ -177,8 +191,25 @@ export default function FallingLeaves() {
     };
 
     let time = 0;
+    let lastFrame = 0;
+    let pageVisible = !document.hidden;
+    const targetFrameInterval = isConstrainedDevice ? 1000 / 45 : 0;
+    const handleVisibilityChange = () => {
+      pageVisible = !document.hidden;
+      if (pageVisible) lastFrame = performance.now();
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    const render = () => {
+    const render = (now: number) => {
+      if (!pageVisible) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+      if (targetFrameInterval && now - lastFrame < targetFrameInterval) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+      lastFrame = now;
       time++;
       ctx.clearRect(0, 0, width, height);
 
@@ -250,6 +281,7 @@ export default function FallingLeaves() {
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handlePointerMove);
       window.removeEventListener("touchmove", handlePointerMove);

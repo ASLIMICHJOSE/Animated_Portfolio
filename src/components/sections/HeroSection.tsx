@@ -209,7 +209,7 @@ export default function HeroSection() {
             <span className="text-emerald-400 font-medium">Available for Opportunities</span>
           </span>
           <span className="hidden sm:inline text-[#F5EFE5]/30">|</span>
-          <span className="hidden sm:inline">TypeScript • React • Next.js • Three.js • GSAP</span>
+          <span className="hidden sm:inline">React.js • Node.js • Express.js • MongoDB • Supabase • REST APIs</span>
         </div>
 
         {/* Scroll Indicator */}

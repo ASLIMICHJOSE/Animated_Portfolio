@@ -325,7 +325,7 @@ export default function ContactSection() {
                 Computer Science Engineer · Frontend &amp; Full-Stack AI Developer · Experience at Admini · Microsoft &amp; MongoDB Certified.
               </p>
               <div className="flex items-center gap-3 mt-2 text-[11px] font-mono text-[#FFE8B8]/80">
-                <span>● 2 Pages</span>
+                <span>● 1 Page</span>
                 <span>● ATS Optimized</span>
                 <span>● Clean Typography</span>
               </div>

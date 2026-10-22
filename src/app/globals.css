@@ -87,6 +87,16 @@ html.lenis, html.lenis body {
   border: 1px solid rgba(245, 239, 229, 0.12);
 }
 
+/* Preserve the glass aesthetic while reducing the expensive backdrop sampling
+   area on compact screens and lower-memory devices. */
+@media (max-width: 767px), (prefers-reduced-data: reduce) {
+  .glass-panel,
+  .glass-panel-warm {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+}
+
 /* Text glow */
 .text-glow {
   text-shadow: 0 0 25px rgba(240, 163, 82, 0.45);
@@ -139,4 +149,3 @@ html, body {
   background-size: 200% 200%;
   animation: borderGlowSweep 3.5s ease infinite;
 }
-
