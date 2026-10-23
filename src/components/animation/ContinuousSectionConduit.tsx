@@ -23,6 +23,11 @@ export default function ContinuousSectionConduit() {
 
   // Dynamically compute the unified, continuous spline through all sections
   const updatePathGeometry = useCallback(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setPathD("");
+      return;
+    }
+
     const mainEl = document.getElementById("main-content");
     if (!mainEl) return;
 
@@ -121,7 +126,11 @@ export default function ContinuousSectionConduit() {
 
   // GSAP ScrollTrigger to scrub the unbroken conduit and energy tracer
   useEffect(() => {
-    if (!pathD || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      !pathD ||
+      window.innerWidth < 768 ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       return;
     }
 
@@ -229,7 +238,7 @@ export default function ContinuousSectionConduit() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible opacity-55"
+      className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible opacity-55 hidden md:block"
       aria-hidden="true"
     >
       <svg className="w-full h-full overflow-visible">

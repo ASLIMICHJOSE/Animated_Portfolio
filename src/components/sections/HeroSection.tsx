@@ -57,41 +57,43 @@ export default function HeroSection() {
           "-=1.2"
         );
 
-      // Scroll-triggered Layered Parallax
-      if (containerRef.current) {
+      const isMobile = window.innerWidth < 768;
+
+      // Scroll-triggered Layered Parallax (Desktop only for 120fps mobile butter smoothness)
+      if (containerRef.current && !isMobile) {
         gsap.to(bgImageRef.current, {
-          yPercent: 22,
-          scale: 1.1,
+          yPercent: 20,
+          scale: 1.08,
           ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top top",
             end: "bottom top",
-            scrub: true,
+            scrub: 1.0,
           },
         });
 
         gsap.to(foliageRef.current, {
-          yPercent: -18,
-          scale: 1.06,
+          yPercent: -15,
+          scale: 1.04,
           ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top top",
             end: "bottom top",
-            scrub: true,
+            scrub: 1.0,
           },
         });
 
         gsap.to(contentRef.current, {
-          yPercent: 35,
-          opacity: 0.15,
+          yPercent: 30,
+          opacity: 0.2,
           ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top top",
             end: "bottom 30%",
-            scrub: true,
+            scrub: 1.0,
           },
         });
       }
@@ -104,12 +106,12 @@ export default function HeroSection() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#201C19]"
+      className="relative min-h-[92vh] sm:min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#201C19]"
     >
       {/* Layer 0: Anime Autumn City Backdrop */}
       <div
         ref={bgImageRef}
-        className="absolute inset-0 w-full h-[120%] -top-[10%] pointer-events-none will-change-transform"
+        className="absolute inset-0 w-full h-[115%] -top-[7%] pointer-events-none will-change-transform"
       >
         <Image
           src="/images/hero-autumn-city.jpg"
@@ -143,17 +145,17 @@ export default function HeroSection() {
       {/* Layer 3: Editorial Hero Content */}
       <div
         ref={contentRef}
-        className="relative z-20 max-w-5xl mx-auto px-6 sm:px-8 text-center pt-24 pb-16 will-change-transform flex flex-col items-center justify-center"
+        className="relative z-20 max-w-5xl mx-auto px-4 sm:px-8 text-center pt-24 sm:pt-28 pb-14 sm:pb-16 will-change-transform flex flex-col items-center justify-center w-full"
       >
         {/* Badge */}
-        <div ref={subtitleRef} className="mb-6 flex flex-col items-center gap-2">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#201C19]/80 border border-[#C96F3B]/40 backdrop-blur-md shadow-lg shadow-black/30">
+        <div ref={subtitleRef} className="mb-4 sm:mb-6 flex flex-col items-center gap-2">
+          <div className="inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-[#201C19]/85 border border-[#C96F3B]/40 backdrop-blur-md shadow-lg shadow-black/30">
             <Sparkles className="w-3.5 h-3.5 text-[#F0A352] animate-pulse" />
-            <span className="text-xs font-mono tracking-widest text-[#F0A352] uppercase">
+            <span className="text-[11px] sm:text-xs font-mono tracking-widest text-[#F0A352] uppercase">
               Creative Engineering & UI/UX
             </span>
-            <span className="text-[#F5EFE5]/40 text-xs">•</span>
-            <span className="text-xs font-mono text-[#F5EFE5]/85 uppercase tracking-wider">
+            <span className="text-[#F5EFE5]/40 text-xs hidden sm:inline">•</span>
+            <span className="text-[11px] sm:text-xs font-mono text-[#F5EFE5]/85 uppercase tracking-wider hidden sm:inline">
               Autumn Journey
             </span>
           </div>
@@ -162,29 +164,30 @@ export default function HeroSection() {
         {/* Main Monolithic Identity */}
         <h1
           ref={titleRef}
-          className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-extrabold text-[#F5EFE5] tracking-tight leading-[1.05] mb-6 drop-shadow-2xl"
+          className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-serif font-extrabold text-[#F5EFE5] tracking-tight leading-[1.08] mb-4 sm:mb-6 drop-shadow-2xl px-2"
         >
           <span>{portfolioData.personal.name}</span>
         </h1>
 
         {/* Cinematic Subtitle & Statement */}
-        <p className="text-lg sm:text-xl md:text-2xl text-[#F5EFE5]/90 font-serif font-normal max-w-3xl mb-4 leading-relaxed">
+        <p className="text-base sm:text-xl md:text-2xl text-[#F5EFE5]/90 font-serif font-normal max-w-3xl mb-3 sm:mb-4 leading-relaxed px-2">
           {portfolioData.personal.title}
         </p>
 
-        <p className="text-sm sm:text-base text-[#F5EFE5]/75 font-sans font-light max-w-2xl mb-10 leading-relaxed">
+        <p className="text-xs sm:text-sm md:text-base text-[#F5EFE5]/75 font-sans font-light max-w-2xl mb-8 sm:mb-10 leading-relaxed px-2">
           {portfolioData.personal.tagline}
         </p>
 
-        {/* Call to Actions */}
+        {/* Call to Actions (Full-width clean stack on mobile, horizontal row on desktop) */}
         <div
           ref={ctaRef}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
+          className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto max-w-xs sm:max-w-none"
         >
           <Button
             href="#projects"
             variant="primary"
             size="lg"
+            className="w-full sm:w-auto min-h-[48px]"
             icon={<FolderGit2 className="w-4 h-4" />}
             ariaLabel="Explore featured projects"
           >
@@ -195,6 +198,7 @@ export default function HeroSection() {
             href="#contact"
             variant="outline"
             size="lg"
+            className="w-full sm:w-auto min-h-[48px]"
             icon={<Mail className="w-4 h-4" />}
             ariaLabel="Get in touch with Asli Mich Jose"
           >
@@ -203,21 +207,23 @@ export default function HeroSection() {
         </div>
 
         {/* Subtle Tech Stack Footer */}
-        <div className="mt-12 inline-flex items-center gap-6 text-xs font-mono text-[#F5EFE5]/50">
+        <div className="mt-8 sm:mt-12 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] sm:text-xs font-mono text-[#F5EFE5]/60 max-w-xl px-2">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
             <span className="text-emerald-400 font-medium">Available for Opportunities</span>
           </span>
           <span className="hidden sm:inline text-[#F5EFE5]/30">|</span>
-          <span className="hidden sm:inline">React.js • Node.js • Express.js • MongoDB • Supabase • REST APIs</span>
+          <span className="text-center text-[10px] sm:text-xs leading-normal">
+            React.js • Node.js • Express.js • MongoDB • REST APIs
+          </span>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="mt-10 flex flex-col items-center gap-2 pointer-events-none opacity-70">
-          <span className="text-[10px] font-mono tracking-widest text-[#F0A352] uppercase">
+        <div className="mt-8 sm:mt-10 flex flex-col items-center gap-1.5 pointer-events-none opacity-70">
+          <span className="text-[9px] sm:text-[10px] font-mono tracking-widest text-[#F0A352] uppercase">
             Scroll to Journey
           </span>
-          <ArrowDown className="w-4 h-4 text-[#F0A352] animate-bounce" />
+          <ArrowDown className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-[#F0A352] animate-bounce" />
         </div>
       </div>
     </section>

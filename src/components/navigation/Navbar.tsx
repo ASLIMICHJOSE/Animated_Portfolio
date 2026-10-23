@@ -33,6 +33,17 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   const navLinks = [
     { name: "Intro", href: "#hero", id: "hero", label: "01" },
     { name: "About", href: "#about", id: "about", label: "02" },
@@ -131,7 +142,7 @@ export default function Navbar() {
       {/* Mobile Drawer Overlay */}
       {mobileMenuOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-[#201C19]/95 backdrop-blur-2xl pointer-events-auto flex flex-col justify-between p-8 animate-in fade-in duration-300"
+          className="md:hidden fixed inset-0 z-50 bg-[#181310]/98 backdrop-blur-2xl pointer-events-auto flex flex-col justify-between p-6 sm:p-8 animate-in fade-in duration-300"
           style={{ top: "0px", height: "100vh" }}
         >
           <div className="flex items-center justify-between border-b border-[#C96F3B]/20 pb-5">

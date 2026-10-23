@@ -19,9 +19,15 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 
     const { gsap, ScrollTrigger } = initGSAP();
 
-    // Ultra-smooth, zero-lag linear interpolation (lerp) momentum scroll
+    const isTouchOrMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 768 ||
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0);
+
+    // On mobile devices, native 120Hz momentum scroll is optimal; Lenis is configured with zero friction
     const lenis = new Lenis({
-      lerp: 0.085, // Instantaneous, organic tracking without sluggish input delay or inertia drag
+      lerp: isTouchOrMobile ? 1.0 : 0.085, // Native 1:1 instantaneous response on mobile, silky lerp on desktop
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
@@ -44,7 +50,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 
     gsap.ticker.add(updateTicker);
     // Intelligent lag smoothing: absorbs momentary GPU/CPU micro-stalls without jumping
-    gsap.ticker.lagSmoothing(500, 33);
+    gsap.ticker.lagSmoothing(isTouchOrMobile ? 0 : 500, isTouchOrMobile ? 0 : 33);
 
     // Intercept in-page hash anchor clicks to smoothly scroll via Lenis
     const handleAnchorClick = (e: MouseEvent) => {

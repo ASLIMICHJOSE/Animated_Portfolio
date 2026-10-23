@@ -2,6 +2,7 @@ import Navbar from "@/components/navigation/Navbar";
 import AmbientEffects from "@/components/animation/AmbientEffects";
 import SmoothScroll from "@/components/animation/SmoothScroll";
 import ContinuousSectionConduit from "@/components/animation/ContinuousSectionConduit";
+import InteractiveCompanionDock from "@/components/ui/InteractiveCompanionDock";
 import HeroSection from "@/components/sections/HeroSection";
 import AboutSection from "@/components/sections/AboutSection";
 import SkillsSection from "@/components/sections/SkillsSection";
@@ -19,6 +20,9 @@ export default function Home() {
 
         {/* Global Navigation */}
         <Navbar />
+
+        {/* Interactive Experience Dock (Audio Synthesizer, Gust Trigger, Discovery Beacon & CLI) */}
+        <InteractiveCompanionDock />
 
         {/* Cinematic Spatial Portfolio Sections */}
         <main id="main-content" className="relative z-10">

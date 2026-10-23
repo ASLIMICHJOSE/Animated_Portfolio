@@ -218,12 +218,13 @@ export default function ContactSection() {
             </button>
           </div>
 
-          {/* Direct Actions & Socials */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-6 border-t border-[#C96F3B]/25">
+          {/* Direct Actions & Socials (Ergonomic full-width stack on mobile, horizontal row on desktop) */}
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-6 border-t border-[#C96F3B]/25">
             <Button
               href={`mailto:${portfolioData.socials.email}`}
               variant="primary"
               size="md"
+              className="w-full sm:w-auto min-h-[46px]"
               icon={<Send className="w-4 h-4" />}
               ariaLabel="Send an email to Asli Mich Jose"
             >
@@ -236,6 +237,7 @@ export default function ContactSection() {
                 variant="outline"
                 size="md"
                 external
+                className="w-full sm:w-auto min-h-[46px]"
                 icon={<GithubIcon className="w-4 h-4" />}
                 ariaLabel="Visit GitHub profile"
               >
@@ -249,6 +251,7 @@ export default function ContactSection() {
                 variant="outline"
                 size="md"
                 external
+                className="w-full sm:w-auto min-h-[46px]"
                 icon={<LinkedinIcon className="w-4 h-4" />}
                 ariaLabel="Visit LinkedIn profile"
               >
@@ -261,6 +264,7 @@ export default function ContactSection() {
                 href={`tel:${portfolioData.socials.phone.replace(/[^0-9+]/g, "")}`}
                 variant="outline"
                 size="md"
+                className="w-full sm:w-auto min-h-[46px]"
                 icon={<Phone className="w-4 h-4" />}
                 ariaLabel="Call Asli Mich Jose J"
               >

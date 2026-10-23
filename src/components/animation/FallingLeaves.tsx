@@ -31,6 +31,14 @@ interface WindRibbon {
   color: string;
 }
 
+interface Shockwave {
+  x: number;
+  y: number;
+  radius: number;
+  maxRadius: number;
+  alpha: number;
+}
+
 const AUTUMN_COLORS = [
   "#C96F3B", // Burnt orange
   "#9E472D", // Autumn rust
@@ -87,6 +95,7 @@ export default function FallingLeaves() {
     let lastMouseMoveTime = Date.now();
 
     const ribbons: WindRibbon[] = [];
+    const shockwaves: Shockwave[] = [];
 
     const handlePointerMove = (e: MouseEvent | TouchEvent) => {
       let cx = 0;
@@ -113,26 +122,108 @@ export default function FallingLeaves() {
 
       // Spawn subtle golden stardust particles along cursor motion if moving with intent
       const speed = Math.hypot(mouseVx, mouseVy);
-      if (speed > 4 && ribbons.length < (isConstrainedDevice ? 18 : 36) && Math.random() < 0.6) {
+      if (speed > 4 && ribbons.length < (isConstrainedDevice ? 10 : 30) && Math.random() < (isConstrainedDevice ? 0.3 : 0.6)) {
         ribbons.push({
           x: cx + (Math.random() - 0.5) * 12,
           y: cy + (Math.random() - 0.5) * 12,
           vx: mouseVx * 0.15 + (Math.random() - 0.5) * 1.5,
           vy: mouseVy * 0.15 - Math.random() * 1.2,
           life: 0,
-          maxLife: Math.random() * 24 + 18,
-          size: Math.random() * 2.5 + 1.2,
-          alpha: 0.9,
+          maxLife: Math.random() * 20 + 16,
+          size: Math.random() * 2.2 + 1.0,
+          alpha: 0.85,
           color: Math.random() > 0.4 ? "#F0A352" : "#FFE8B8",
         });
       }
     };
 
+    // Interactive Click/Tap: creates an expanding amber shockwave and scatters nearby leaves
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      let cx = 0;
+      let cy = 0;
+      if ("touches" in e && e.touches.length > 0) {
+        cx = e.touches[0].clientX;
+        cy = e.touches[0].clientY;
+      } else if ("clientX" in e) {
+        cx = (e as MouseEvent).clientX;
+        cy = (e as MouseEvent).clientY;
+      }
+
+      if (cx <= 0 && cy <= 0) return;
+
+      // Add shockwave ring
+      shockwaves.push({
+        x: cx,
+        y: cy,
+        radius: 5,
+        maxRadius: isConstrainedDevice ? 90 : 140,
+        alpha: 0.8,
+      });
+
+      // Spawn radial stardust burst
+      const burstCount = isConstrainedDevice ? 6 : 12;
+      for (let b = 0; b < burstCount; b++) {
+        const angle = (b / burstCount) * Math.PI * 2 + Math.random() * 0.4;
+        const vel = Math.random() * 3 + 2;
+        ribbons.push({
+          x: cx,
+          y: cy,
+          vx: Math.cos(angle) * vel,
+          vy: Math.sin(angle) * vel,
+          life: 0,
+          maxLife: Math.random() * 18 + 14,
+          size: Math.random() * 2.5 + 1.2,
+          alpha: 0.9,
+          color: b % 2 === 0 ? "#F0A352" : "#FFE8B8",
+        });
+      }
+
+      // Physics impulse on nearby leaves
+      leaves.forEach((leaf) => {
+        const dx = leaf.x - cx;
+        const dy = leaf.y - cy;
+        const dist = Math.hypot(dx, dy);
+        if (dist < (isConstrainedDevice ? 150 : 220) && dist > 1) {
+          const force = (1 - dist / (isConstrainedDevice ? 150 : 220)) * 6.5;
+          leaf.speedX += (dx / dist) * force;
+          leaf.speedY += (dy / dist) * force - 1.5;
+          leaf.angleSpeed += (Math.random() - 0.5) * 0.08;
+          window.dispatchEvent(new CustomEvent("leaf-interacted", { detail: { x: cx, y: cy } }));
+        }
+      });
+    };
+
+    // Listen for custom "summon-gust" event from UI buttons or terminal
+    const handleSummonGust = () => {
+      leaves.forEach((leaf) => {
+        const dir = Math.random() > 0.5 ? 1 : -1;
+        leaf.speedX += dir * (Math.random() * 6 + 4);
+        leaf.speedY = -Math.random() * 4 - 2;
+        leaf.angleSpeed += dir * 0.06;
+      });
+      // Flurry of stardust
+      for (let s = 0; s < (isConstrainedDevice ? 12 : 25); s++) {
+        ribbons.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 6,
+          vy: -Math.random() * 4 - 1,
+          life: 0,
+          maxLife: 30,
+          size: Math.random() * 2.5 + 1.2,
+          alpha: 0.9,
+          color: "#F0A352",
+        });
+      }
+    };
+
+    window.addEventListener("summon-gust", handleSummonGust);
+    window.addEventListener("pointerdown", handlePointerDown, { passive: true });
     window.addEventListener("mousemove", handlePointerMove, { passive: true });
     window.addEventListener("touchmove", handlePointerMove, { passive: true });
 
-    // Pool of elegant falling maple leaves
-    const targetCount = isConstrainedDevice ? 10 : 20;
+    // Pool of elegant falling maple leaves (6 on mobile, 18 on desktop)
+    const targetCount = isConstrainedDevice ? 6 : 18;
     let leafIdCounter = 0;
 
     const createLeaf = (initialRandomY = false): Leaf => ({
@@ -217,6 +308,25 @@ export default function FallingLeaves() {
       mouseVx *= 0.88;
       mouseVy *= 0.88;
 
+      // 0. UPDATE AND RENDER AMBER SHOCKWAVE EXPANDING RINGS
+      for (let s = shockwaves.length - 1; s >= 0; s--) {
+        const sw = shockwaves[s];
+        sw.radius += isConstrainedDevice ? 4 : 5.5;
+        sw.alpha = (1 - sw.radius / sw.maxRadius) * 0.75;
+        if (sw.radius >= sw.maxRadius || sw.alpha <= 0) {
+          shockwaves.splice(s, 1);
+        } else {
+          ctx.save();
+          ctx.globalAlpha = sw.alpha;
+          ctx.strokeStyle = "#F0A352";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
       // 1. UPDATE AND RENDER GOLDEN WIND EMBERS
       for (let r = ribbons.length - 1; r >= 0; r--) {
         const rb = ribbons[r];
@@ -231,8 +341,10 @@ export default function FallingLeaves() {
           ctx.save();
           ctx.globalAlpha = rb.alpha;
           ctx.fillStyle = rb.color;
-          ctx.shadowColor = rb.color;
-          ctx.shadowBlur = 6;
+          if (!isConstrainedDevice) {
+            ctx.shadowColor = rb.color;
+            ctx.shadowBlur = 5;
+          }
           ctx.beginPath();
           ctx.arc(rb.x, rb.y, rb.size, 0, Math.PI * 2);
           ctx.fill();
@@ -283,6 +395,8 @@ export default function FallingLeaves() {
       cancelAnimationFrame(animationFrameId);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("summon-gust", handleSummonGust);
       window.removeEventListener("mousemove", handlePointerMove);
       window.removeEventListener("touchmove", handlePointerMove);
     };

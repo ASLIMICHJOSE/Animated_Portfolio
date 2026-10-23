@@ -8,7 +8,12 @@ export default function CinematicWorld3D() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // If mobile viewport or user prefers reduced motion, skip heavy 3D WebGL camera flight
+    // Mobile devices already render high-fidelity anime backdrops natively via Next.js Image with CSS parallax
+    if (
+      window.innerWidth < 768 ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       return;
     }
 
@@ -28,7 +33,6 @@ export default function CinematicWorld3D() {
 
     const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
     const isConstrainedDevice =
-      width < 768 ||
       (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
       (deviceMemory && deviceMemory <= 4);
     const renderer = new THREE.WebGLRenderer({

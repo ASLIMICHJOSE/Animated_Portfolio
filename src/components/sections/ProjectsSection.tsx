@@ -32,14 +32,29 @@ export default function ProjectsSection() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+  const [isMobileView, setIsMobileView] = useState<boolean>(false);
 
   const projects = portfolioData.projects;
   const total = projects.length;
 
-  // 1. Scroll-Trigger Stacking Timeline
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setReducedMotion(true);
+    const checkMobile = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile, { passive: true });
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // 1. Scroll-Trigger Stacking Timeline (Desktop only; mobile uses clean vertical flow)
+  useEffect(() => {
+    if (
+      window.innerWidth < 768 ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        setReducedMotion(true);
+      }
       return;
     }
 
@@ -359,13 +374,13 @@ export default function ProjectsSection() {
         </div>
       </div>
 
-      {/* 2. CENTER STAGE: Lenis.dev Signature Overlapping Stacked Cards + Right-side Unfold Dossier */}
+      {/* 2. CENTER STAGE: Lenis.dev Signature Overlapping Stacked Cards on Desktop / Responsive Vertical Flow on Mobile */}
       <div className="relative z-10 w-full max-w-7xl mx-auto flex-1 flex items-center justify-center my-auto overflow-visible">
-        {reducedMotion ? (
-          // Accessible fallback for prefers-reduced-motion
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full py-6">
+        {isMobileView || reducedMotion ? (
+          // Responsive Clean Flow for Mobile & Reduced Motion: Zero lag, fully accessible buttons, 120fps native scroll
+          <div className="flex flex-col gap-6 w-full py-4">
             {projects.map((project: Project, index: number) => (
-              <div key={project.id} className="h-[460px]">
+              <div key={project.id} className="h-[460px] sm:h-[480px] w-full">
                 <ProjectCard
                   project={project}
                   index={index}
@@ -411,7 +426,7 @@ export default function ProjectsSection() {
 
             {/* 3. RIGHT SIDE: PHYSICAL 3D UNFOLDING PROJECT DOSSIER */}
             {selectedProject && (
-              <div className="fixed lg:relative inset-4 sm:inset-6 lg:inset-auto z-50 lg:z-30 w-auto lg:w-[54%] xl:w-[56%] h-[90vh] lg:h-[72vh] max-h-[660px] min-h-[460px] flex items-center justify-center pointer-events-auto">
+              <div className="fixed lg:relative inset-3 sm:inset-6 lg:inset-auto z-50 lg:z-30 w-auto lg:w-[54%] xl:w-[56%] h-[90vh] lg:h-[72vh] max-h-[660px] min-h-[460px] flex items-center justify-center pointer-events-auto">
                 {/* Backdrop on mobile screens */}
                 <div
                   onClick={handleCloseDossier}
@@ -559,15 +574,15 @@ export default function ProjectsSection() {
                   </div>
 
                   {/* Footer Action Buttons */}
-                  <div className="dossier-spec-item flex items-center justify-between gap-3 pt-3 border-t border-[#C96F3B]/30">
+                  <div className="dossier-spec-item flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3 border-t border-[#C96F3B]/30">
                     {selectedProject.githubUrl && (
                       <a
                         href={selectedProject.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs font-mono text-[#F5EFE5]/80 hover:text-[#F0A352] px-3.5 py-2 rounded-xl bg-[#201C19] border border-[#C96F3B]/30 hover:border-[#F0A352] transition-colors shadow-sm"
+                        className="inline-flex items-center justify-center gap-2 text-xs font-mono text-[#F5EFE5]/90 hover:text-[#F0A352] px-4 py-2.5 rounded-xl bg-[#201C19] border border-[#C96F3B]/30 hover:border-[#F0A352] transition-colors shadow-sm min-h-[44px]"
                       >
-                        <GithubIcon className="w-3.5 h-3.5" />
+                        <GithubIcon className="w-4 h-4" />
                         <span>Inspect Repo</span>
                       </a>
                     )}
@@ -577,10 +592,10 @@ export default function ProjectsSection() {
                         href={selectedProject.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#181310] bg-gradient-to-r from-[#F0A352] to-[#FFE8B8] hover:brightness-110 px-5 py-2 rounded-full transition-all duration-300 shadow-md shadow-[#F0A352]/25 ml-auto"
+                        className="inline-flex items-center justify-center gap-2 text-xs font-mono font-bold text-[#181310] bg-gradient-to-r from-[#F0A352] to-[#FFE8B8] hover:brightness-110 px-5 py-2.5 rounded-full transition-all duration-300 shadow-md shadow-[#F0A352]/25 sm:ml-auto min-h-[44px]"
                       >
                         <span>Launch Project</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
+                        <ArrowUpRight className="w-4 h-4" />
                       </a>
                     )}
                   </div>

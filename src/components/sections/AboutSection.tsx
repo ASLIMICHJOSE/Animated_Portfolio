@@ -66,25 +66,27 @@ export default function AboutSection() {
         });
       }
 
+      const isMobile = window.innerWidth < 768;
+
       // 2. Smooth Progressive Card & Content Tracking Reveals
       const revealItems = [
-        { el: cardRef.current, x: -40, start: "top 75%" },
-        { el: bioRef.current, x: 40, start: "top 72%" },
-        { el: learningRef.current, x: 35, start: "top 68%" },
-        { el: interestsRef.current, x: 30, start: "top 65%" },
+        { el: cardRef.current, x: isMobile ? 0 : -40, start: "top 80%" },
+        { el: bioRef.current, x: isMobile ? 0 : 40, start: "top 78%" },
+        { el: learningRef.current, x: isMobile ? 0 : 35, start: "top 76%" },
+        { el: interestsRef.current, x: isMobile ? 0 : 30, start: "top 74%" },
       ];
 
       revealItems.forEach(({ el, x, start }) => {
         if (!el) return;
         gsap.fromTo(
           el,
-          { opacity: 0, y: 50, x, scale: 0.95 },
+          { opacity: 0, y: isMobile ? 25 : 50, x, scale: isMobile ? 1 : 0.96 },
           {
             opacity: 1,
             y: 0,
             x: 0,
             scale: 1,
-            duration: 1.0,
+            duration: isMobile ? 0.6 : 0.95,
             ease: "power2.out",
             scrollTrigger: {
               trigger: el,
@@ -103,7 +105,7 @@ export default function AboutSection() {
     <section
       id="about"
       ref={sectionRef}
-      className="relative min-h-screen py-28 sm:py-36 px-6 sm:px-8 overflow-hidden flex items-center bg-[#201C19]"
+      className="relative min-h-screen py-20 sm:py-32 px-4 sm:px-8 overflow-hidden flex items-center bg-[#201C19]"
     >
       {/* Dynamic Layer 0: Full-Bleed Anime Autumn Garden Background */}
       <div

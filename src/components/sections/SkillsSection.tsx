@@ -53,6 +53,12 @@ export default function SkillsSection() {
       return;
     }
 
+    const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+    if (!isDesktop) {
+      // Mobile & tablet use smooth native touch-snap scroll without screen pinning
+      return;
+    }
+
     const section = sectionRef.current;
     const trackWrapper = trackWrapperRef.current;
     const track = trackRef.current;
@@ -67,7 +73,7 @@ export default function SkillsSection() {
       // Calibrate pinned scroll distance so horizontal scroll matches natural vertical velocity
       const getScrollDistance = () => {
         const travel = getTotalTravel();
-        return Math.max(Math.round(window.innerHeight * 2.8), Math.round(travel * 1.15));
+        return Math.max(Math.round(window.innerHeight * 2.5), Math.round(travel * 1.1));
       };
 
       // 1. "Before it set": Vertical scroll takes ~2 scrolls while cards slide in from the right
@@ -174,8 +180,8 @@ export default function SkillsSection() {
         />
       </div>
 
-      {/* Pinned Fullscreen Showcase Stage (Vertically centered) */}
-      <div className="relative w-full h-screen overflow-hidden flex items-center justify-center">
+      {/* Showcase Stage (Responsive touch-snap on mobile, pinned horizontal runway on desktop) */}
+      <div className="relative w-full min-h-screen py-24 lg:py-0 lg:h-screen overflow-hidden flex flex-col justify-center">
         {/* Dynamic Layer 0: Full-Bleed Anime Observatory Pavilion Background */}
         <div
           ref={bgImageRef}
@@ -196,15 +202,30 @@ export default function SkillsSection() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(240,163,82,0.18)_0%,transparent_65%)] pointer-events-none" />
         <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-[#C96F3B]/15 blur-[140px] pointer-events-none" />
 
-        {/* Center: Full-Screen Horizontal Runway */}
-        <div className="relative z-10 w-full overflow-visible">
-          <div ref={trackWrapperRef} className="w-max will-change-transform">
+        {/* Mobile Header (Shown on mobile screens for immediate clarity) */}
+        <div className="lg:hidden relative z-20 px-4 sm:px-6 mb-6 max-w-xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#201C19]/90 border border-[#F0A352]/40 text-[10px] font-mono text-[#F0A352] mb-3 shadow-sm">
+            <Sparkles className="w-3 h-3 text-[#F0A352]" />
+            <span className="font-bold tracking-widest uppercase">ACT 02 // CAPABILITIES</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-serif font-black text-[#F5EFE5] tracking-tight leading-tight uppercase flex items-center justify-center gap-2.5">
+            <span>SKILLS</span>
+            <ArrowRight className="w-6 h-6 text-[#F0A352]" />
+          </h2>
+          <p className="text-xs sm:text-sm font-sans text-[#F5EFE5]/75 mt-2 leading-relaxed">
+            Swipe sideways to explore all 5 engineering domains.
+          </p>
+        </div>
+
+        {/* Center: Responsive Runway (Touch Snap on Mobile, Pinned Track on Desktop) */}
+        <div className="relative z-10 w-full overflow-x-auto lg:overflow-visible no-scrollbar">
+          <div ref={trackWrapperRef} className="w-full lg:w-max will-change-transform">
             <div
               ref={trackRef}
-              className="flex flex-nowrap items-center gap-6 sm:gap-10 px-4 sm:px-8 w-max will-change-transform"
+              className="flex flex-row items-stretch lg:items-center gap-4 sm:gap-6 lg:gap-10 px-4 sm:px-8 w-full lg:w-max snap-x snap-mandatory lg:snap-none overflow-x-auto lg:overflow-visible no-scrollbar pb-6 lg:pb-0 will-change-transform"
             >
-              {/* 1. BIG 'SKILLS' TITLE (Matches ASLI MICH JOSE size, with arrow after text) */}
-              <div className="flex flex-col justify-center h-[56vh] sm:h-[62vh] min-h-[440px] max-h-[580px] shrink-0 select-none pr-4 sm:pr-8 md:pr-12 first:ml-[4vw] sm:first:ml-[6vw] lg:first:ml-[7vw]">
+              {/* 1. BIG 'SKILLS' TITLE (Desktop Lead Banner) */}
+              <div className="hidden lg:flex flex-col justify-center h-[56vh] sm:h-[62vh] min-h-[440px] max-h-[580px] shrink-0 select-none pr-4 sm:pr-8 md:pr-12 first:ml-[4vw] sm:first:ml-[6vw] lg:first:ml-[7vw]">
                 <div className="card-parallax-inner flex flex-col justify-center">
                   <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#201C19]/80 border border-[#F0A352]/40 text-[11px] font-mono text-[#F0A352] mb-4 w-fit shadow-sm backdrop-blur-sm">
                     <Sparkles className="w-3.5 h-3.5 text-[#F0A352]" />
@@ -243,9 +264,9 @@ export default function SkillsSection() {
                 return (
                   <div
                     key={category.title}
-                    className="flex flex-col w-[85vw] sm:w-[460px] md:w-[490px] lg:w-[520px] shrink-0 select-none group"
+                    className="flex flex-col w-[86vw] sm:w-[420px] md:w-[460px] lg:w-[520px] snap-center shrink-0 select-none group"
                   >
-                    <div className="relative h-[56vh] sm:h-[62vh] min-h-[440px] max-h-[580px] rounded-3xl overflow-hidden glass-panel border border-[#C96F3B]/35 group-hover:border-[#F0A352] transition-all duration-500 shadow-2xl shadow-black/70 bg-[#1A1614]/90 flex flex-col">
+                    <div className="relative h-[500px] sm:h-[540px] lg:h-[62vh] min-h-[460px] max-h-[580px] rounded-3xl overflow-hidden glass-panel border border-[#C96F3B]/35 group-hover:border-[#F0A352] transition-all duration-500 shadow-2xl shadow-black/70 bg-[#1A1614]/95 flex flex-col">
                       <div className="card-parallax-inner p-6 sm:p-9 flex flex-col justify-between h-full relative z-10">
                         {/* Top Row: Icon, Index & Domain Tag */}
                         <div>

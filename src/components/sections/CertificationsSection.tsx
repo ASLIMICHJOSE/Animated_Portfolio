@@ -408,13 +408,13 @@ export default function CertificationsSection() {
           description="Industry-recognized accreditations spanning Microsoft Azure Cloud, MongoDB Vector Search & AI Agents, Retrieval-Augmented Generation (RAG), and Professional Software Engineering."
         />
 
-        {/* Interactive Filter Pills */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 -mt-8 sm:-mt-10 mb-10 sm:mb-14">
+        {/* Interactive Filter Pills (Touch scrollable on mobile) */}
+        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto no-scrollbar -mt-6 sm:-mt-10 mb-8 sm:mb-14 px-2 py-1 max-w-full">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 border ${
+              className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-mono transition-all duration-300 border shrink-0 min-h-[38px] ${
                 activeCategory === category
                   ? "bg-[#F0A352] text-[#181310] font-bold border-[#F0A352] shadow-[0_0_15px_rgba(240,163,82,0.4)] scale-105"
                   : "bg-[#201C19]/80 text-[#F5EFE5]/70 border-[#C96F3B]/30 hover:border-[#F0A352]/60 hover:text-[#F5EFE5]"
@@ -664,13 +664,13 @@ export default function CertificationsSection() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-[#C96F3B]/30 bg-[#1D1714] flex items-center justify-between text-xs font-mono text-[#F5EFE5]/60">
-              <span className="text-[#F0A352]">
+            <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-t border-[#C96F3B]/30 bg-[#1D1714] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-[#F5EFE5]/70">
+              <span className="text-[#F0A352] truncate max-w-full text-center sm:text-left">
                 Credential ID: {inspectCert.credentialId || "AZ-900 / Official Verified"}
               </span>
               <button
                 onClick={handleCloseModal}
-                className="px-4 py-1.5 rounded-full bg-[#F0A352] text-[#181310] font-bold hover:brightness-110 transition-all shadow-sm"
+                className="w-full sm:w-auto px-5 py-2 rounded-full bg-[#F0A352] text-[#181310] font-bold hover:brightness-110 transition-all shadow-sm text-center min-h-[40px] flex items-center justify-center"
               >
                 Close [ESC]
               </button>

@@ -242,28 +242,32 @@ export default function JourneySection() {
           const centerNode = card.querySelector<HTMLElement>(".milestone-node");
           const nodePulse = card.querySelector<HTMLElement>(".milestone-node-pulse");
 
-          // 3D Perspective Card Entrance
+          const isMobile = window.innerWidth < 768;
+
+          // 3D Perspective Card Entrance (Clean vertical slide on mobile for zero lag)
           if (contentBox) {
             gsap.fromTo(
               contentBox,
               {
                 opacity: 0,
-                x: isEven ? 55 : -55,
-                rotateY: isEven ? -16 : 16,
-                scale: 0.94,
-                filter: "brightness(0.7)",
+                x: isMobile ? 0 : isEven ? 55 : -55,
+                y: isMobile ? 30 : 0,
+                rotateY: isMobile ? 0 : isEven ? -16 : 16,
+                scale: isMobile ? 1 : 0.94,
+                filter: isMobile ? "none" : "brightness(0.7)",
               },
               {
                 opacity: 1,
                 x: 0,
+                y: 0,
                 rotateY: 0,
                 scale: 1,
                 filter: "brightness(1)",
-                duration: 0.85,
+                duration: isMobile ? 0.5 : 0.85,
                 ease: "power3.out",
                 scrollTrigger: {
                   trigger: card,
-                  start: "top 82%",
+                  start: "top 85%",
                   toggleActions: "play none none reverse",
                   onEnter: () => setActiveStation(index),
                   onEnterBack: () => setActiveStation(index),
@@ -372,12 +376,12 @@ export default function JourneySection() {
         />
 
         {/* Station Navigation Pill Bar: Interactive Quick-Jumper */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 -mt-8 sm:-mt-10 mb-12 sm:mb-16">
+        <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar -mt-6 sm:-mt-10 mb-10 sm:mb-16 px-2 py-1 max-w-full">
           {milestones.map((item, idx) => (
             <button
               key={item.period}
               onClick={() => scrollToStation(idx)}
-              className={`px-3 sm:px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 flex items-center gap-2 border ${
+              className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-mono transition-all duration-300 flex items-center gap-2 border shrink-0 min-h-[38px] ${
                 activeStation === idx
                   ? "bg-[#F0A352] text-[#181310] font-bold border-[#F0A352] shadow-[0_0_15px_rgba(240,163,82,0.4)] scale-105"
                   : "bg-[#201C19]/80 text-[#F5EFE5]/70 border-[#C96F3B]/30 hover:border-[#F0A352]/60 hover:text-[#F5EFE5]"
